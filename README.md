@@ -23,8 +23,3 @@ python3.7 -m pip install -i https://pypi.org/simple/ -U my-happy-modin
 ```
 
 ## dependency
-
-### graphviz
-```shell
-yum install python-devel graphviz-devel
-```
