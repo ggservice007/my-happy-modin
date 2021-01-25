@@ -12,16 +12,16 @@
 # governing permissions and limitations under the License.
 
 import numpy as np
-import pandas
-from pandas.core.common import is_bool_indexer
-from pandas.core.indexing import check_bool_indexer
-from pandas.core.dtypes.common import (
+import my_happy_pandas
+from my_happy_pandas.core.common import is_bool_indexer
+from my_happy_pandas.core.indexing import check_bool_indexer
+from my_happy_pandas.core.dtypes.common import (
     is_list_like,
     is_numeric_dtype,
     is_datetime_or_timedelta_dtype,
     is_scalar,
 )
-from pandas.core.base import DataError
+from my_happy_pandas.core.base import DataError
 from typing import Type, Callable
 from collections.abc import Iterable, Container
 import warnings
@@ -66,7 +66,7 @@ def _set_axis(axis):
 def _str_map(func_name):
     def str_op_builder(df, *args, **kwargs):
         str_s = df.squeeze(axis=1).str
-        return getattr(pandas.Series.str, func_name)(str_s, *args, **kwargs).to_frame()
+        return getattr(my_happy_pandas.Series.str, func_name)(str_s, *args, **kwargs).to_frame()
 
     return str_op_builder
 
@@ -91,12 +91,12 @@ def _dt_prop_map(property_name):
 
     def dt_op_builder(df, *args, **kwargs):
         prop_val = getattr(df.squeeze(axis=1).dt, property_name)
-        if isinstance(prop_val, pandas.Series):
+        if isinstance(prop_val, my_happy_pandas.Series):
             return prop_val.to_frame()
-        elif isinstance(prop_val, pandas.DataFrame):
+        elif isinstance(prop_val, my_happy_pandas.DataFrame):
             return prop_val
         else:
-            return pandas.DataFrame([prop_val])
+            return my_happy_pandas.DataFrame([prop_val])
 
     return dt_op_builder
 
@@ -121,8 +121,8 @@ def _dt_func_map(func_name):
 
     def dt_op_builder(df, *args, **kwargs):
         dt_s = df.squeeze(axis=1).dt
-        return pandas.DataFrame(
-            getattr(pandas.Series.dt, func_name)(dt_s, *args, **kwargs)
+        return my_happy_pandas.DataFrame(
+            getattr(my_happy_pandas.Series.dt, func_name)(dt_s, *args, **kwargs)
         )
 
     return dt_op_builder
@@ -222,11 +222,11 @@ class PandasQueryCompiler(BaseQueryCompiler):
         }
 
         result = pandas_op(self.to_pandas(), *args, **kwargs)
-        if isinstance(result, pandas.Series):
+        if isinstance(result, my_happy_pandas.Series):
             if result.name is None:
                 result.name = "__reduced__"
             result = result.to_frame()
-        if isinstance(result, pandas.DataFrame):
+        if isinstance(result, my_happy_pandas.DataFrame):
             return self.from_pandas(result, type(self._modin_frame))
         else:
             return result
@@ -308,7 +308,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
             if axis == 0:
                 return result.reset_index(drop=True)
             else:
-                result.columns = pandas.RangeIndex(len(result.columns))
+                result.columns = my_happy_pandas.RangeIndex(len(result.columns))
                 return result
         return result
 
@@ -345,39 +345,39 @@ class PandasQueryCompiler(BaseQueryCompiler):
     # such that columns/rows that don't have an index on the other DataFrame
     # result in NaN values.
 
-    add = BinaryFunction.register(pandas.DataFrame.add)
-    combine = BinaryFunction.register(pandas.DataFrame.combine)
-    combine_first = BinaryFunction.register(pandas.DataFrame.combine_first)
-    eq = BinaryFunction.register(pandas.DataFrame.eq)
-    floordiv = BinaryFunction.register(pandas.DataFrame.floordiv)
-    ge = BinaryFunction.register(pandas.DataFrame.ge)
-    gt = BinaryFunction.register(pandas.DataFrame.gt)
-    le = BinaryFunction.register(pandas.DataFrame.le)
-    lt = BinaryFunction.register(pandas.DataFrame.lt)
-    mod = BinaryFunction.register(pandas.DataFrame.mod)
-    mul = BinaryFunction.register(pandas.DataFrame.mul)
-    ne = BinaryFunction.register(pandas.DataFrame.ne)
-    pow = BinaryFunction.register(pandas.DataFrame.pow)
-    rfloordiv = BinaryFunction.register(pandas.DataFrame.rfloordiv)
-    rmod = BinaryFunction.register(pandas.DataFrame.rmod)
-    rpow = BinaryFunction.register(pandas.DataFrame.rpow)
-    rsub = BinaryFunction.register(pandas.DataFrame.rsub)
-    rtruediv = BinaryFunction.register(pandas.DataFrame.rtruediv)
-    sub = BinaryFunction.register(pandas.DataFrame.sub)
-    truediv = BinaryFunction.register(pandas.DataFrame.truediv)
-    __and__ = BinaryFunction.register(pandas.DataFrame.__and__)
-    __or__ = BinaryFunction.register(pandas.DataFrame.__or__)
-    __rand__ = BinaryFunction.register(pandas.DataFrame.__rand__)
-    __ror__ = BinaryFunction.register(pandas.DataFrame.__ror__)
-    __rxor__ = BinaryFunction.register(pandas.DataFrame.__rxor__)
-    __xor__ = BinaryFunction.register(pandas.DataFrame.__xor__)
+    add = BinaryFunction.register(my_happy_pandas.DataFrame.add)
+    combine = BinaryFunction.register(my_happy_pandas.DataFrame.combine)
+    combine_first = BinaryFunction.register(my_happy_pandas.DataFrame.combine_first)
+    eq = BinaryFunction.register(my_happy_pandas.DataFrame.eq)
+    floordiv = BinaryFunction.register(my_happy_pandas.DataFrame.floordiv)
+    ge = BinaryFunction.register(my_happy_pandas.DataFrame.ge)
+    gt = BinaryFunction.register(my_happy_pandas.DataFrame.gt)
+    le = BinaryFunction.register(my_happy_pandas.DataFrame.le)
+    lt = BinaryFunction.register(my_happy_pandas.DataFrame.lt)
+    mod = BinaryFunction.register(my_happy_pandas.DataFrame.mod)
+    mul = BinaryFunction.register(my_happy_pandas.DataFrame.mul)
+    ne = BinaryFunction.register(my_happy_pandas.DataFrame.ne)
+    pow = BinaryFunction.register(my_happy_pandas.DataFrame.pow)
+    rfloordiv = BinaryFunction.register(my_happy_pandas.DataFrame.rfloordiv)
+    rmod = BinaryFunction.register(my_happy_pandas.DataFrame.rmod)
+    rpow = BinaryFunction.register(my_happy_pandas.DataFrame.rpow)
+    rsub = BinaryFunction.register(my_happy_pandas.DataFrame.rsub)
+    rtruediv = BinaryFunction.register(my_happy_pandas.DataFrame.rtruediv)
+    sub = BinaryFunction.register(my_happy_pandas.DataFrame.sub)
+    truediv = BinaryFunction.register(my_happy_pandas.DataFrame.truediv)
+    __and__ = BinaryFunction.register(my_happy_pandas.DataFrame.__and__)
+    __or__ = BinaryFunction.register(my_happy_pandas.DataFrame.__or__)
+    __rand__ = BinaryFunction.register(my_happy_pandas.DataFrame.__rand__)
+    __ror__ = BinaryFunction.register(my_happy_pandas.DataFrame.__ror__)
+    __rxor__ = BinaryFunction.register(my_happy_pandas.DataFrame.__rxor__)
+    __xor__ = BinaryFunction.register(my_happy_pandas.DataFrame.__xor__)
     df_update = BinaryFunction.register(
-        copy_df_for_func(pandas.DataFrame.update, display_name="update"),
+        copy_df_for_func(my_happy_pandas.DataFrame.update, display_name="update"),
         join_type="left",
     )
     series_update = BinaryFunction.register(
         copy_df_for_func(
-            lambda x, y: pandas.Series.update(x.squeeze(axis=1), y.squeeze(axis=1)),
+            lambda x, y: my_happy_pandas.Series.update(x.squeeze(axis=1), y.squeeze(axis=1)),
             display_name="update",
         ),
         join_type="left",
@@ -459,7 +459,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
             kwargs["sort"] = False
 
             def map_func(left, right=right, kwargs=kwargs):
-                return pandas.merge(left, right, **kwargs)
+                return my_happy_pandas.merge(left, right, **kwargs)
 
             new_self = self.__constructor__(
                 self._modin_frame._apply_full_axis(1, map_func)
@@ -493,7 +493,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
                     )
             return new_self.reset_index(drop=True) if is_reset_index else new_self
         else:
-            return self.default_to_pandas(pandas.DataFrame.merge, right, **kwargs)
+            return self.default_to_pandas(my_happy_pandas.DataFrame.merge, right, **kwargs)
 
     def join(self, right, **kwargs):
         """
@@ -521,14 +521,14 @@ class PandasQueryCompiler(BaseQueryCompiler):
             right = right.to_pandas()
 
             def map_func(left, right=right, kwargs=kwargs):
-                return pandas.DataFrame.join(left, right, **kwargs)
+                return my_happy_pandas.DataFrame.join(left, right, **kwargs)
 
             new_self = self.__constructor__(
                 self._modin_frame._apply_full_axis(1, map_func)
             )
             return new_self.sort_rows_by_column_values(on) if sort else new_self
         else:
-            return self.default_to_pandas(pandas.DataFrame.join, right, **kwargs)
+            return self.default_to_pandas(my_happy_pandas.DataFrame.join, right, **kwargs)
 
     # END Inter-Data operations
 
@@ -563,7 +563,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
         level = kwargs.get("level", None)
         # TODO Implement level
         if level is not None or self.has_multiindex():
-            return self.default_to_pandas(pandas.DataFrame.reset_index, **kwargs)
+            return self.default_to_pandas(my_happy_pandas.DataFrame.reset_index, **kwargs)
         if not drop:
             new_column_name = (
                 self.index.name
@@ -575,7 +575,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
             new_self = self.insert(0, new_column_name, self.index)
         else:
             new_self = self.copy()
-        new_self.index = pandas.RangeIndex(len(new_self.index))
+        new_self.index = my_happy_pandas.RangeIndex(len(new_self.index))
         return new_self
 
     # END Reindex/reset_index
@@ -648,7 +648,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
             for i in range(len(left_edges)):
                 edges_list.extend([left_edges.iloc[i], right_edges.iloc[i]])
 
-            edge_case = monotonic_fn(pandas.Series(edges_list))
+            edge_case = monotonic_fn(my_happy_pandas.Series(edges_list))
             return [common_case and edge_case]
 
         return MapReduceFunction.register(
@@ -660,22 +660,22 @@ class PandasQueryCompiler(BaseQueryCompiler):
 
     is_monotonic = _is_monotonic
 
-    count = MapReduceFunction.register(pandas.DataFrame.count, pandas.DataFrame.sum)
-    max = _numeric_only_reduce_fn(MapReduceFunction, pandas.DataFrame.max)
-    min = _numeric_only_reduce_fn(MapReduceFunction, pandas.DataFrame.min)
-    sum = _numeric_only_reduce_fn(MapReduceFunction, pandas.DataFrame.sum)
-    prod = _numeric_only_reduce_fn(MapReduceFunction, pandas.DataFrame.prod)
-    any = MapReduceFunction.register(pandas.DataFrame.any, pandas.DataFrame.any)
-    all = MapReduceFunction.register(pandas.DataFrame.all, pandas.DataFrame.all)
+    count = MapReduceFunction.register(my_happy_pandas.DataFrame.count, my_happy_pandas.DataFrame.sum)
+    max = _numeric_only_reduce_fn(MapReduceFunction, my_happy_pandas.DataFrame.max)
+    min = _numeric_only_reduce_fn(MapReduceFunction, my_happy_pandas.DataFrame.min)
+    sum = _numeric_only_reduce_fn(MapReduceFunction, my_happy_pandas.DataFrame.sum)
+    prod = _numeric_only_reduce_fn(MapReduceFunction, my_happy_pandas.DataFrame.prod)
+    any = MapReduceFunction.register(my_happy_pandas.DataFrame.any, my_happy_pandas.DataFrame.any)
+    all = MapReduceFunction.register(my_happy_pandas.DataFrame.all, my_happy_pandas.DataFrame.all)
     memory_usage = MapReduceFunction.register(
-        pandas.DataFrame.memory_usage,
-        lambda x, *args, **kwargs: pandas.DataFrame.sum(x),
+        my_happy_pandas.DataFrame.memory_usage,
+        lambda x, *args, **kwargs: my_happy_pandas.DataFrame.sum(x),
         axis=0,
     )
 
     def mean(self, axis, **kwargs):
         if kwargs.get("level") is not None:
-            return self.default_to_pandas(pandas.DataFrame.mean, axis=axis, **kwargs)
+            return self.default_to_pandas(my_happy_pandas.DataFrame.mean, axis=axis, **kwargs)
 
         skipna = kwargs.get("skipna", True)
 
@@ -683,7 +683,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
         # Since `count(numeric_only=True)` discards all unknown "numeric" types, we can get incorrect
         # divisor inside the reduce function.
         def map_fn(df, **kwargs):
-            result = pandas.DataFrame(
+            result = my_happy_pandas.DataFrame(
                 {
                     "sum": df.sum(axis=axis, skipna=skipna),
                     "count": df.count(axis=axis, numeric_only=True),
@@ -695,7 +695,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
             sum_cols = df["sum"] if axis else df.loc["sum"]
             count_cols = df["count"] if axis else df.loc["count"]
 
-            if not isinstance(sum_cols, pandas.Series):
+            if not isinstance(sum_cols, my_happy_pandas.Series):
                 # If we got `NaN` as the result of the sum in any axis partition,
                 # then we must consider the whole sum as `NaN`, so setting `skipna=False`
                 sum_cols = sum_cols.sum(axis=axis, skipna=False)
@@ -759,21 +759,21 @@ class PandasQueryCompiler(BaseQueryCompiler):
     # END MapReduce operations
 
     # Reduction operations
-    idxmax = ReductionFunction.register(pandas.DataFrame.idxmax)
-    idxmin = ReductionFunction.register(pandas.DataFrame.idxmin)
-    median = _numeric_only_reduce_fn(ReductionFunction, pandas.DataFrame.median)
-    nunique = ReductionFunction.register(pandas.DataFrame.nunique)
-    skew = _numeric_only_reduce_fn(ReductionFunction, pandas.DataFrame.skew)
-    kurt = _numeric_only_reduce_fn(ReductionFunction, pandas.DataFrame.kurt)
-    sem = _numeric_only_reduce_fn(ReductionFunction, pandas.DataFrame.sem)
-    std = _numeric_only_reduce_fn(ReductionFunction, pandas.DataFrame.std)
-    var = _numeric_only_reduce_fn(ReductionFunction, pandas.DataFrame.var)
-    sum_min_count = _numeric_only_reduce_fn(ReductionFunction, pandas.DataFrame.sum)
-    prod_min_count = _numeric_only_reduce_fn(ReductionFunction, pandas.DataFrame.prod)
-    quantile_for_single_value = ReductionFunction.register(pandas.DataFrame.quantile)
-    mad = ReductionFunction.register(pandas.DataFrame.mad)
+    idxmax = ReductionFunction.register(my_happy_pandas.DataFrame.idxmax)
+    idxmin = ReductionFunction.register(my_happy_pandas.DataFrame.idxmin)
+    median = _numeric_only_reduce_fn(ReductionFunction, my_happy_pandas.DataFrame.median)
+    nunique = ReductionFunction.register(my_happy_pandas.DataFrame.nunique)
+    skew = _numeric_only_reduce_fn(ReductionFunction, my_happy_pandas.DataFrame.skew)
+    kurt = _numeric_only_reduce_fn(ReductionFunction, my_happy_pandas.DataFrame.kurt)
+    sem = _numeric_only_reduce_fn(ReductionFunction, my_happy_pandas.DataFrame.sem)
+    std = _numeric_only_reduce_fn(ReductionFunction, my_happy_pandas.DataFrame.std)
+    var = _numeric_only_reduce_fn(ReductionFunction, my_happy_pandas.DataFrame.var)
+    sum_min_count = _numeric_only_reduce_fn(ReductionFunction, my_happy_pandas.DataFrame.sum)
+    prod_min_count = _numeric_only_reduce_fn(ReductionFunction, my_happy_pandas.DataFrame.prod)
+    quantile_for_single_value = ReductionFunction.register(my_happy_pandas.DataFrame.quantile)
+    mad = ReductionFunction.register(my_happy_pandas.DataFrame.mad)
     to_datetime = ReductionFunction.register(
-        lambda df, *args, **kwargs: pandas.to_datetime(
+        lambda df, *args, **kwargs: my_happy_pandas.to_datetime(
             df.squeeze(axis=1), *args, **kwargs
         ),
         axis=1,
@@ -788,7 +788,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
             if df_op is not None:
                 df = df_op(df)
             resampled_val = df.resample(*resample_args)
-            op = getattr(pandas.core.resample.Resampler, func_name)
+            op = getattr(my_happy_pandas.core.resample.Resampler, func_name)
             if callable(op):
                 try:
                     # This will happen with Arrow buffer read-only errors. We don't want to copy
@@ -800,7 +800,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
             else:
                 val = getattr(resampled_val, func_name)
 
-            if isinstance(val, pandas.Series):
+            if isinstance(val, my_happy_pandas.Series):
                 return val.to_frame()
             else:
                 return val
@@ -973,75 +973,75 @@ class PandasQueryCompiler(BaseQueryCompiler):
         return self._resample_func(resample_args, "quantile", q=q, **kwargs)
 
     window_mean = FoldFunction.register(
-        lambda df, rolling_args, *args, **kwargs: pandas.DataFrame(
+        lambda df, rolling_args, *args, **kwargs: my_happy_pandas.DataFrame(
             df.rolling(*rolling_args).mean(*args, **kwargs)
         )
     )
     window_sum = FoldFunction.register(
-        lambda df, rolling_args, *args, **kwargs: pandas.DataFrame(
+        lambda df, rolling_args, *args, **kwargs: my_happy_pandas.DataFrame(
             df.rolling(*rolling_args).sum(*args, **kwargs)
         )
     )
     window_var = FoldFunction.register(
-        lambda df, rolling_args, ddof, *args, **kwargs: pandas.DataFrame(
+        lambda df, rolling_args, ddof, *args, **kwargs: my_happy_pandas.DataFrame(
             df.rolling(*rolling_args).var(ddof=ddof, *args, **kwargs)
         )
     )
     window_std = FoldFunction.register(
-        lambda df, rolling_args, ddof, *args, **kwargs: pandas.DataFrame(
+        lambda df, rolling_args, ddof, *args, **kwargs: my_happy_pandas.DataFrame(
             df.rolling(*rolling_args).std(ddof=ddof, *args, **kwargs)
         )
     )
     rolling_count = FoldFunction.register(
-        lambda df, rolling_args: pandas.DataFrame(df.rolling(*rolling_args).count())
+        lambda df, rolling_args: my_happy_pandas.DataFrame(df.rolling(*rolling_args).count())
     )
     rolling_sum = FoldFunction.register(
-        lambda df, rolling_args, *args, **kwargs: pandas.DataFrame(
+        lambda df, rolling_args, *args, **kwargs: my_happy_pandas.DataFrame(
             df.rolling(*rolling_args).sum(*args, **kwargs)
         )
     )
     rolling_mean = FoldFunction.register(
-        lambda df, rolling_args, *args, **kwargs: pandas.DataFrame(
+        lambda df, rolling_args, *args, **kwargs: my_happy_pandas.DataFrame(
             df.rolling(*rolling_args).mean(*args, **kwargs)
         )
     )
     rolling_median = FoldFunction.register(
-        lambda df, rolling_args, **kwargs: pandas.DataFrame(
+        lambda df, rolling_args, **kwargs: my_happy_pandas.DataFrame(
             df.rolling(*rolling_args).median(**kwargs)
         )
     )
     rolling_var = FoldFunction.register(
-        lambda df, rolling_args, ddof, *args, **kwargs: pandas.DataFrame(
+        lambda df, rolling_args, ddof, *args, **kwargs: my_happy_pandas.DataFrame(
             df.rolling(*rolling_args).var(ddof=ddof, *args, **kwargs)
         )
     )
     rolling_std = FoldFunction.register(
-        lambda df, rolling_args, ddof, *args, **kwargs: pandas.DataFrame(
+        lambda df, rolling_args, ddof, *args, **kwargs: my_happy_pandas.DataFrame(
             df.rolling(*rolling_args).std(ddof=ddof, *args, **kwargs)
         )
     )
     rolling_min = FoldFunction.register(
-        lambda df, rolling_args, *args, **kwargs: pandas.DataFrame(
+        lambda df, rolling_args, *args, **kwargs: my_happy_pandas.DataFrame(
             df.rolling(*rolling_args).min(*args, **kwargs)
         )
     )
     rolling_max = FoldFunction.register(
-        lambda df, rolling_args, *args, **kwargs: pandas.DataFrame(
+        lambda df, rolling_args, *args, **kwargs: my_happy_pandas.DataFrame(
             df.rolling(*rolling_args).max(*args, **kwargs)
         )
     )
     rolling_skew = FoldFunction.register(
-        lambda df, rolling_args, **kwargs: pandas.DataFrame(
+        lambda df, rolling_args, **kwargs: my_happy_pandas.DataFrame(
             df.rolling(*rolling_args).skew(**kwargs)
         )
     )
     rolling_kurt = FoldFunction.register(
-        lambda df, rolling_args, **kwargs: pandas.DataFrame(
+        lambda df, rolling_args, **kwargs: my_happy_pandas.DataFrame(
             df.rolling(*rolling_args).kurt(**kwargs)
         )
     )
     rolling_apply = FoldFunction.register(
-        lambda df, rolling_args, func, raw, engine, engine_kwargs, args, kwargs: pandas.DataFrame(
+        lambda df, rolling_args, func, raw, engine, engine_kwargs, args, kwargs: my_happy_pandas.DataFrame(
             df.rolling(*rolling_args).apply(
                 func=func,
                 raw=raw,
@@ -1053,7 +1053,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
         )
     )
     rolling_quantile = FoldFunction.register(
-        lambda df, rolling_args, quantile, interpolation, **kwargs: pandas.DataFrame(
+        lambda df, rolling_args, quantile, interpolation, **kwargs: my_happy_pandas.DataFrame(
             df.rolling(*rolling_args).quantile(
                 quantile=quantile, interpolation=interpolation, **kwargs
             )
@@ -1063,13 +1063,13 @@ class PandasQueryCompiler(BaseQueryCompiler):
     def rolling_corr(self, rolling_args, other, pairwise, *args, **kwargs):
         if len(self.columns) > 1:
             return self.default_to_pandas(
-                lambda df: pandas.DataFrame.rolling(df, *rolling_args).corr(
+                lambda df: my_happy_pandas.DataFrame.rolling(df, *rolling_args).corr(
                     other=other, pairwise=pairwise, *args, **kwargs
                 )
             )
         else:
             return FoldFunction.register(
-                lambda df: pandas.DataFrame(
+                lambda df: my_happy_pandas.DataFrame(
                     df.rolling(*rolling_args).corr(
                         other=other, pairwise=pairwise, *args, **kwargs
                     )
@@ -1079,13 +1079,13 @@ class PandasQueryCompiler(BaseQueryCompiler):
     def rolling_cov(self, rolling_args, other, pairwise, ddof, **kwargs):
         if len(self.columns) > 1:
             return self.default_to_pandas(
-                lambda df: pandas.DataFrame.rolling(df, *rolling_args).cov(
+                lambda df: my_happy_pandas.DataFrame.rolling(df, *rolling_args).cov(
                     other=other, pairwise=pairwise, ddof=ddof, **kwargs
                 )
             )
         else:
             return FoldFunction.register(
-                lambda df: pandas.DataFrame(
+                lambda df: my_happy_pandas.DataFrame(
                     df.rolling(*rolling_args).cov(
                         other=other, pairwise=pairwise, ddof=ddof, **kwargs
                     )
@@ -1095,7 +1095,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
     def rolling_aggregate(self, rolling_args, func, *args, **kwargs):
         new_modin_frame = self._modin_frame._apply_full_axis(
             0,
-            lambda df: pandas.DataFrame(
+            lambda df: my_happy_pandas.DataFrame(
                 df.rolling(*rolling_args).aggregate(func=func, *args, **kwargs)
             ),
             new_index=self.index,
@@ -1103,8 +1103,8 @@ class PandasQueryCompiler(BaseQueryCompiler):
         return self.__constructor__(new_modin_frame)
 
     def unstack(self, level, fill_value):
-        if not isinstance(self.index, pandas.MultiIndex) or (
-            isinstance(self.index, pandas.MultiIndex)
+        if not isinstance(self.index, my_happy_pandas.MultiIndex) or (
+            isinstance(self.index, my_happy_pandas.MultiIndex)
             and is_list_like(level)
             and len(level) == self.index.nlevels
         ):
@@ -1117,10 +1117,10 @@ class PandasQueryCompiler(BaseQueryCompiler):
             need_reindex = False
 
         def map_func(df):
-            return pandas.DataFrame(df.unstack(level=level, fill_value=fill_value))
+            return my_happy_pandas.DataFrame(df.unstack(level=level, fill_value=fill_value))
 
         def is_tree_like_or_1d(calc_index, valid_index):
-            if not isinstance(calc_index, pandas.MultiIndex):
+            if not isinstance(calc_index, my_happy_pandas.MultiIndex):
                 return True
             actual_len = 1
             for lvl in calc_index.levels:
@@ -1132,8 +1132,8 @@ class PandasQueryCompiler(BaseQueryCompiler):
 
         is_all_multi_list = False
         if (
-            isinstance(self.index, pandas.MultiIndex)
-            and isinstance(self.columns, pandas.MultiIndex)
+            isinstance(self.index, my_happy_pandas.MultiIndex)
+            and isinstance(self.columns, my_happy_pandas.MultiIndex)
             and is_list_like(level)
             and len(level) == self.index.nlevels
             and is_tree_like_or_1d_index
@@ -1169,7 +1169,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
             new_columns = (
                 get_unique_level_values(columns) if consider_columns else [columns]
             )
-            return pandas.MultiIndex.from_product([*new_columns, *new_index])
+            return my_happy_pandas.MultiIndex.from_product([*new_columns, *new_index])
 
         if is_all_multi_list and is_tree_like_or_1d_index and is_tree_like_or_1d_cols:
             result = result.sort_index()
@@ -1182,16 +1182,16 @@ class PandasQueryCompiler(BaseQueryCompiler):
 
         if need_reindex:
             if is_tree_like_or_1d_index and is_tree_like_or_1d_cols:
-                is_recompute_index = isinstance(self.index, pandas.MultiIndex)
+                is_recompute_index = isinstance(self.index, my_happy_pandas.MultiIndex)
                 is_recompute_columns = not is_recompute_index and isinstance(
-                    self.columns, pandas.MultiIndex
+                    self.columns, my_happy_pandas.MultiIndex
                 )
                 new_index = compute_index(
                     self.index, self.columns, is_recompute_index, is_recompute_columns
                 )
             elif is_tree_like_or_1d_index != is_tree_like_or_1d_cols:
-                if isinstance(self.columns, pandas.MultiIndex) or not isinstance(
-                    self.index, pandas.MultiIndex
+                if isinstance(self.columns, my_happy_pandas.MultiIndex) or not isinstance(
+                    self.index, my_happy_pandas.MultiIndex
                 ):
                     return result
                 else:
@@ -1199,17 +1199,17 @@ class PandasQueryCompiler(BaseQueryCompiler):
                         self.index.sortlevel()[0]
                         if is_tree_like_or_1d_index
                         and not is_tree_like_or_1d_cols
-                        and isinstance(self.index, pandas.MultiIndex)
+                        and isinstance(self.index, my_happy_pandas.MultiIndex)
                         else self.index
                     )
-                    index = pandas.MultiIndex.from_tuples(
+                    index = my_happy_pandas.MultiIndex.from_tuples(
                         list(index) * len(self.columns)
                     )
                     columns = self.columns.repeat(len(self.index))
                     index_levels = [
                         index.get_level_values(i) for i in range(index.nlevels)
                     ]
-                    new_index = pandas.MultiIndex.from_arrays(
+                    new_index = my_happy_pandas.MultiIndex.from_arrays(
                         [columns] + index_levels,
                         names=self.columns.names + self.index.names,
                     )
@@ -1219,8 +1219,8 @@ class PandasQueryCompiler(BaseQueryCompiler):
         return result
 
     def stack(self, level, dropna):
-        if not isinstance(self.columns, pandas.MultiIndex) or (
-            isinstance(self.columns, pandas.MultiIndex)
+        if not isinstance(self.columns, my_happy_pandas.MultiIndex) or (
+            isinstance(self.columns, my_happy_pandas.MultiIndex)
             and is_list_like(level)
             and len(level) == self.columns.nlevels
         ):
@@ -1230,42 +1230,42 @@ class PandasQueryCompiler(BaseQueryCompiler):
 
         new_modin_frame = self._modin_frame._apply_full_axis(
             1,
-            lambda df: pandas.DataFrame(df.stack(level=level, dropna=dropna)),
+            lambda df: my_happy_pandas.DataFrame(df.stack(level=level, dropna=dropna)),
             new_columns=new_columns,
         )
         return self.__constructor__(new_modin_frame)
 
     # Map partitions operations
     # These operations are operations that apply a function to every partition.
-    abs = MapFunction.register(pandas.DataFrame.abs, dtypes="copy")
-    applymap = MapFunction.register(pandas.DataFrame.applymap)
+    abs = MapFunction.register(my_happy_pandas.DataFrame.abs, dtypes="copy")
+    applymap = MapFunction.register(my_happy_pandas.DataFrame.applymap)
     conj = MapFunction.register(
-        lambda df, *args, **kwargs: pandas.DataFrame(np.conj(df))
+        lambda df, *args, **kwargs: my_happy_pandas.DataFrame(np.conj(df))
     )
-    invert = MapFunction.register(pandas.DataFrame.__invert__)
-    isin = MapFunction.register(pandas.DataFrame.isin, dtypes=np.bool)
-    isna = MapFunction.register(pandas.DataFrame.isna, dtypes=np.bool)
+    invert = MapFunction.register(my_happy_pandas.DataFrame.__invert__)
+    isin = MapFunction.register(my_happy_pandas.DataFrame.isin, dtypes=np.bool)
+    isna = MapFunction.register(my_happy_pandas.DataFrame.isna, dtypes=np.bool)
     _isfinite = MapFunction.register(
-        lambda df, *args, **kwargs: pandas.DataFrame(np.isfinite(df))
+        lambda df, *args, **kwargs: my_happy_pandas.DataFrame(np.isfinite(df))
     )
-    negative = MapFunction.register(pandas.DataFrame.__neg__)
-    notna = MapFunction.register(pandas.DataFrame.notna, dtypes=np.bool)
-    round = MapFunction.register(pandas.DataFrame.round)
-    replace = MapFunction.register(pandas.DataFrame.replace)
+    negative = MapFunction.register(my_happy_pandas.DataFrame.__neg__)
+    notna = MapFunction.register(my_happy_pandas.DataFrame.notna, dtypes=np.bool)
+    round = MapFunction.register(my_happy_pandas.DataFrame.round)
+    replace = MapFunction.register(my_happy_pandas.DataFrame.replace)
     series_view = MapFunction.register(
-        lambda df, *args, **kwargs: pandas.DataFrame(
+        lambda df, *args, **kwargs: my_happy_pandas.DataFrame(
             df.squeeze(axis=1).view(*args, **kwargs)
         )
     )
     to_numeric = MapFunction.register(
-        lambda df, *args, **kwargs: pandas.DataFrame(
-            pandas.to_numeric(df.squeeze(axis=1), *args, **kwargs)
+        lambda df, *args, **kwargs: my_happy_pandas.DataFrame(
+            my_happy_pandas.to_numeric(df.squeeze(axis=1), *args, **kwargs)
         )
     )
 
     def repeat(self, repeats):
         def map_fn(df):
-            return pandas.DataFrame(df.squeeze(axis=1).repeat(repeats))
+            return my_happy_pandas.DataFrame(df.squeeze(axis=1).repeat(repeats))
 
         if isinstance(repeats, int) or (is_list_like(repeats) and len(repeats) == 1):
             return MapFunction.register(map_fn, validate_index=True)(self)
@@ -1392,7 +1392,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
 
                 value_number += 1
 
-            return pandas.DataFrame(processed_results)
+            return my_happy_pandas.DataFrame(processed_results)
 
         def reduce_func(map_results, *args, **kwargs):
             def get_value_index(value_result):
@@ -1419,10 +1419,10 @@ class PandasQueryCompiler(BaseQueryCompiler):
                 lambda ser: get_value_index(ser)
             ).squeeze()
 
-            if isinstance(map_results_parsed, pandas.Series):
+            if isinstance(map_results_parsed, my_happy_pandas.Series):
                 map_results_parsed = map_results_parsed.to_list()
 
-            return pandas.Series(map_results_parsed)
+            return my_happy_pandas.Series(map_results_parsed)
 
         return MapReduceFunction.register(map_func, reduce_func, preserve_index=False)(
             self, **kwargs
@@ -1457,10 +1457,10 @@ class PandasQueryCompiler(BaseQueryCompiler):
     dt_daysinmonth = MapFunction.register(_dt_prop_map("daysinmonth"))
     dt_days_in_month = MapFunction.register(_dt_prop_map("days_in_month"))
     dt_tz = MapReduceFunction.register(
-        _dt_prop_map("tz"), lambda df: pandas.DataFrame(df.iloc[0]), axis=0
+        _dt_prop_map("tz"), lambda df: my_happy_pandas.DataFrame(df.iloc[0]), axis=0
     )
     dt_freq = MapReduceFunction.register(
-        _dt_prop_map("freq"), lambda df: pandas.DataFrame(df.iloc[0]), axis=0
+        _dt_prop_map("freq"), lambda df: my_happy_pandas.DataFrame(df.iloc[0]), axis=0
     )
     dt_to_period = MapFunction.register(_dt_func_map("to_period"))
     dt_to_pydatetime = MapFunction.register(_dt_func_map("to_pydatetime"))
@@ -1512,7 +1512,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
 
         def first_valid_index_builder(df):
             return df.set_axis(
-                pandas.RangeIndex(len(df.index)), axis="index", inplace=False
+                my_happy_pandas.RangeIndex(len(df.index)), axis="index", inplace=False
             ).apply(lambda df: df.first_valid_index())
 
         # We get the minimum from each column, then take the min of that to get
@@ -1537,7 +1537,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
 
         def last_valid_index_builder(df):
             return df.set_axis(
-                pandas.RangeIndex(len(df.index)), axis="index", inplace=False
+                my_happy_pandas.RangeIndex(len(df.index)), axis="index", inplace=False
             ).apply(lambda df: df.last_valid_index())
 
         # We get the maximum from each column, then take the max of that to get
@@ -1568,7 +1568,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
         """
         # Use pandas to calculate the correct columns
         empty_df = (
-            pandas.DataFrame(columns=self.columns)
+            my_happy_pandas.DataFrame(columns=self.columns)
             .astype(self.dtypes)
             .describe(**kwargs)
         )
@@ -1582,7 +1582,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
             for col_name in empty_df.dtypes.index:
                 # if previosly type of `col_name` was datetime or timedelta
                 if is_datetime_or_timedelta_dtype(self.dtypes[col_name]):
-                    new_index = pandas.Index(
+                    new_index = my_happy_pandas.Index(
                         empty_df.index.to_list() + ["first"] + ["last"]
                     )
                     break
@@ -1607,11 +1607,11 @@ class PandasQueryCompiler(BaseQueryCompiler):
     # that is being operated on. This means that we have to put all of that
     # data in the same place.
 
-    cummax = FoldFunction.register(pandas.DataFrame.cummax)
-    cummin = FoldFunction.register(pandas.DataFrame.cummin)
-    cumsum = FoldFunction.register(pandas.DataFrame.cumsum)
-    cumprod = FoldFunction.register(pandas.DataFrame.cumprod)
-    diff = FoldFunction.register(pandas.DataFrame.diff)
+    cummax = FoldFunction.register(my_happy_pandas.DataFrame.cummax)
+    cummin = FoldFunction.register(my_happy_pandas.DataFrame.cummin)
+    cumsum = FoldFunction.register(my_happy_pandas.DataFrame.cumsum)
+    cumprod = FoldFunction.register(my_happy_pandas.DataFrame.cumprod)
+    diff = FoldFunction.register(my_happy_pandas.DataFrame.diff)
 
     def clip(self, lower, upper, **kwargs):
         kwargs["upper"] = upper
@@ -1700,7 +1700,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
                         else:
                             result[i, j] = np.nan
 
-            return pandas.DataFrame(result)
+            return my_happy_pandas.DataFrame(result)
 
         columns = self.columns
         index = columns.copy()
@@ -1738,9 +1738,9 @@ class PandasQueryCompiler(BaseQueryCompiler):
         def map_func(df, other=other, squeeze_self=squeeze_self):
             result = df.squeeze(axis=1).dot(other) if squeeze_self else df.dot(other)
             if is_list_like(result):
-                return pandas.DataFrame(result)
+                return my_happy_pandas.DataFrame(result)
             else:
-                return pandas.DataFrame([result])
+                return my_happy_pandas.DataFrame([result])
 
         num_cols = other.shape[1] if len(other.shape) > 1 else 1
         if len(self.columns) == 1:
@@ -1764,12 +1764,12 @@ class PandasQueryCompiler(BaseQueryCompiler):
     def _nsort(self, n, columns=None, keep="first", sort_type="nsmallest"):
         def map_func(df, n=n, keep=keep, columns=columns):
             if columns is None:
-                return pandas.DataFrame(
-                    getattr(pandas.Series, sort_type)(
+                return my_happy_pandas.DataFrame(
+                    getattr(my_happy_pandas.Series, sort_type)(
                         df.squeeze(axis=1), n=n, keep=keep
                     )
                 )
-            return getattr(pandas.DataFrame, sort_type)(
+            return getattr(my_happy_pandas.DataFrame, sort_type)(
                 df, n=n, columns=columns, keep=keep
             )
 
@@ -1801,11 +1801,11 @@ class PandasQueryCompiler(BaseQueryCompiler):
         # Make a copy of columns and eval on the copy to determine if result type is
         # series or not
         empty_eval = (
-            pandas.DataFrame(columns=self.columns)
+            my_happy_pandas.DataFrame(columns=self.columns)
             .astype(self.dtypes)
             .eval(expr, inplace=False, **kwargs)
         )
-        if isinstance(empty_eval, pandas.Series):
+        if isinstance(empty_eval, my_happy_pandas.Series):
             new_columns = (
                 [empty_eval.name] if empty_eval.name is not None else ["__reduced__"]
             )
@@ -1813,7 +1813,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
             new_columns = empty_eval.columns
         new_modin_frame = self._modin_frame._apply_full_axis(
             1,
-            lambda df: pandas.DataFrame(df.eval(expr, inplace=False, **kwargs)),
+            lambda df: my_happy_pandas.DataFrame(df.eval(expr, inplace=False, **kwargs)),
             new_index=self.index,
             new_columns=new_columns,
         )
@@ -1828,23 +1828,23 @@ class PandasQueryCompiler(BaseQueryCompiler):
         axis = kwargs.get("axis", 0)
 
         def mode_builder(df):
-            result = pandas.DataFrame(df.mode(**kwargs))
+            result = my_happy_pandas.DataFrame(df.mode(**kwargs))
             # We return a dataframe with the same shape as the input to ensure
             # that all the partitions will be the same shape
             if axis == 0 and len(df) != len(result):
                 # Pad rows
-                result = result.reindex(index=pandas.RangeIndex(len(df.index)))
+                result = result.reindex(index=my_happy_pandas.RangeIndex(len(df.index)))
             elif axis == 1 and len(df.columns) != len(result.columns):
                 # Pad columns
-                result = result.reindex(columns=pandas.RangeIndex(len(df.columns)))
-            return pandas.DataFrame(result)
+                result = result.reindex(columns=my_happy_pandas.RangeIndex(len(df.columns)))
+            return my_happy_pandas.DataFrame(result)
 
         if axis == 0:
-            new_index = pandas.RangeIndex(len(self.index))
+            new_index = my_happy_pandas.RangeIndex(len(self.index))
             new_columns = self.columns
         else:
             new_index = self.index
-            new_columns = pandas.RangeIndex(len(self.columns))
+            new_columns = my_happy_pandas.RangeIndex(len(self.columns))
         new_modin_frame = self._modin_frame._apply_full_axis(
             axis, mode_builder, new_index=new_index, new_columns=new_columns
         )
@@ -1888,7 +1888,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
         axis = kwargs.get("axis", 0)
         q = kwargs.get("q")
         numeric_only = kwargs.get("numeric_only", True)
-        assert isinstance(q, (pandas.Series, np.ndarray, pandas.Index, list))
+        assert isinstance(q, (my_happy_pandas.Series, np.ndarray, my_happy_pandas.Index, list))
 
         if numeric_only:
             new_columns = self._modin_frame._numeric_columns()
@@ -1918,9 +1918,9 @@ class PandasQueryCompiler(BaseQueryCompiler):
         # correctness and cleanliness of the code.
         if axis == 1:
             q_index = new_columns
-            new_columns = pandas.Float64Index(q)
+            new_columns = my_happy_pandas.Float64Index(q)
         else:
-            q_index = pandas.Float64Index(q)
+            q_index = my_happy_pandas.Float64Index(q)
         new_modin_frame = query_compiler._modin_frame._apply_full_axis(
             axis,
             lambda df: quantile_builder(df, **kwargs),
@@ -1978,7 +1978,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
 
         if level is not None or self.has_multiindex(axis=axis):
             return self.default_to_pandas(
-                pandas.DataFrame.sort_index,
+                my_happy_pandas.DataFrame.sort_index,
                 axis=axis,
                 level=level,
                 sort_remaining=sort_remaining,
@@ -1993,10 +1993,10 @@ class PandasQueryCompiler(BaseQueryCompiler):
             ascending = False
         kwargs["ascending"] = ascending
         if axis:
-            new_columns = pandas.Series(self.columns).sort_values(**kwargs)
+            new_columns = my_happy_pandas.Series(self.columns).sort_values(**kwargs)
             new_index = self.index
         else:
-            new_index = pandas.Series(self.index).sort_values(**kwargs)
+            new_index = my_happy_pandas.Series(self.index).sort_values(**kwargs)
             new_columns = self.columns
         new_modin_frame = self._modin_frame._apply_full_axis(
             axis,
@@ -2046,9 +2046,9 @@ class PandasQueryCompiler(BaseQueryCompiler):
 
         def applyier(df, internal_indices, other=[], internal_other_indices=[]):
             if len(other):
-                other = pandas.concat(other, axis=1)
+                other = my_happy_pandas.concat(other, axis=1)
                 columns_to_add = other.columns.difference(df.columns)
-                df = pandas.concat([df, other[columns_to_add]], axis=1)
+                df = my_happy_pandas.concat([df, other[columns_to_add]], axis=1)
             return df.melt(
                 id_vars=id_vars,
                 value_vars=df.columns[internal_indices],
@@ -2075,7 +2075,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
         new_parts = np.array(
             [np.array([x]) for x in np.concatenate(inconsistent_frame._partitions.T)]
         )
-        new_index = pandas.RangeIndex(len(self.index) * len(value_vars))
+        new_index = my_happy_pandas.RangeIndex(len(self.index) * len(value_vars))
         new_modin_frame = self._modin_frame.__constructor__(
             new_parts,
             index=new_index,
@@ -2095,7 +2095,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
 
         Parameters
         ----------
-        key : PandasQueryCompiler, numpy.ndarray, pandas.Index or list
+        key : PandasQueryCompiler, numpy.ndarray, my_happy_pandas.Index or list
             Target numeric indices or labels by which to retrieve data.
 
         Returns
@@ -2107,7 +2107,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
         if isinstance(key, type(self)):
             key = key.to_pandas().squeeze(axis=1)
         if is_bool_indexer(key):
-            if isinstance(key, pandas.Series) and not key.index.equals(self.index):
+            if isinstance(key, my_happy_pandas.Series) and not key.index.equals(self.index):
                 warnings.warn(
                     "Boolean Series key will be reindexed to match DataFrame index.",
                     PendingDeprecationWarning,
@@ -2123,12 +2123,12 @@ class PandasQueryCompiler(BaseQueryCompiler):
             # We convert to a RangeIndex because getitem_row_array is expecting a list
             # of indices, and RangeIndex will give us the exact indices of each boolean
             # requested.
-            key = pandas.RangeIndex(len(self.index))[key]
+            key = my_happy_pandas.RangeIndex(len(self.index))[key]
             if len(key):
                 return self.getitem_row_array(key)
             else:
                 return self.from_pandas(
-                    pandas.DataFrame(columns=self.columns), type(self._modin_frame)
+                    my_happy_pandas.DataFrame(columns=self.columns), type(self._modin_frame)
                 )
         else:
             if any(k not in self.columns for k in key):
@@ -2238,7 +2238,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
         return self.__constructor__(
             self._modin_frame.filter_full_axis(
                 kwargs.get("axis", 0) ^ 1,
-                lambda df: pandas.DataFrame.dropna(df, **kwargs),
+                lambda df: my_happy_pandas.DataFrame.dropna(df, **kwargs),
             )
         )
 
@@ -2377,7 +2377,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
         def dict_apply_builder(df, func_dict={}):
             # Sometimes `apply` can return a `Series`, but we require that internally
             # all objects are `DataFrame`s.
-            return pandas.DataFrame(df.apply(func_dict, *args, **kwargs))
+            return my_happy_pandas.DataFrame(df.apply(func_dict, *args, **kwargs))
 
         func = {k: wrap_udf_function(v) if callable(v) else v for k, v in func.items()}
         return self.__constructor__(
@@ -2416,7 +2416,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
         func = [wrap_udf_function(f) if callable(f) else f for f in func]
         new_modin_frame = self._modin_frame._apply_full_axis(
             axis,
-            lambda df: pandas.DataFrame(df.apply(func, axis, *args, **kwargs)),
+            lambda df: my_happy_pandas.DataFrame(df.apply(func, axis, *args, **kwargs)),
             new_index=new_index,
             new_columns=new_columns,
         )
@@ -2576,16 +2576,16 @@ class PandasQueryCompiler(BaseQueryCompiler):
             # right index and placing columns in the correct order.
             groupby_kwargs["as_index"] = True
 
-            internal_by_cols = pandas.Index([])
-            missmatched_cols = pandas.Index([])
+            internal_by_cols = my_happy_pandas.Index([])
+            missmatched_cols = my_happy_pandas.Index([])
             if by is not None:
                 internal_by_df = by[internal_by]
 
-                if isinstance(internal_by_df, pandas.Series):
+                if isinstance(internal_by_df, my_happy_pandas.Series):
                     internal_by_df = internal_by_df.to_frame()
 
                 missmatched_cols = internal_by_df.columns.difference(df.columns)
-                df = pandas.concat(
+                df = my_happy_pandas.concat(
                     [df, internal_by_df[missmatched_cols]],
                     axis=1,
                     copy=False,
@@ -2595,7 +2595,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
                 external_by = by.columns.difference(internal_by)
                 external_by_df = by[external_by].squeeze(axis=1)
 
-                if isinstance(external_by_df, pandas.DataFrame):
+                if isinstance(external_by_df, my_happy_pandas.DataFrame):
                     external_by_cols = [o for _, o in external_by_df.iteritems()]
                 else:
                     external_by_cols = [external_by_df]
@@ -2623,8 +2623,8 @@ class PandasQueryCompiler(BaseQueryCompiler):
                 # numeric operation is done. We need to build the index here to avoid
                 # issues with extracting the index.
                 except (DataError, TypeError):
-                    result = pandas.DataFrame(index=grouped_df.size().index)
-                if isinstance(result, pandas.Series):
+                    result = my_happy_pandas.DataFrame(index=grouped_df.size().index)
+                if isinstance(result, my_happy_pandas.Series):
                     result = result.to_frame(
                         result.name if result.name is not None else "__reduced__"
                     )
@@ -2634,7 +2634,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
 
                 if not as_index:
                     keep_index_levels = len(by) > 1 and any(
-                        isinstance(x, pandas.CategoricalDtype)
+                        isinstance(x, my_happy_pandas.CategoricalDtype)
                         for x in df[internal_by_cols].dtypes
                     )
 
@@ -2664,7 +2664,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
                                 result.index = result.index.droplevel(lvls_to_drop)
 
                     if (
-                        not isinstance(result.index, pandas.MultiIndex)
+                        not isinstance(result.index, my_happy_pandas.MultiIndex)
                         and result.index.name is None
                     ):
                         drop = True
@@ -2718,10 +2718,10 @@ class PandasQueryCompiler(BaseQueryCompiler):
             # determening type of raised exception by applying `aggfunc`
             # to empty DataFrame
             try:
-                pandas.DataFrame(index=[1], columns=[1]).agg(agg_func) if isinstance(
+                my_happy_pandas.DataFrame(index=[1], columns=[1]).agg(agg_func) if isinstance(
                     agg_func, dict
                 ) else agg_func(
-                    pandas.DataFrame(index=[1], columns=[1]).groupby(level=0),
+                    my_happy_pandas.DataFrame(index=[1], columns=[1]).groupby(level=0),
                     **agg_kwargs,
                 )
             except Exception as e:
@@ -2732,10 +2732,10 @@ class PandasQueryCompiler(BaseQueryCompiler):
     # END Manual Partitioning methods
 
     def pivot(self, index, columns, values):
-        from pandas.core.reshape.pivot import _convert_by
+        from my_happy_pandas.core.reshape.pivot import _convert_by
 
         def __convert_by(by):
-            if isinstance(by, pandas.Index):
+            if isinstance(by, my_happy_pandas.Index):
                 by = list(by)
             by = _convert_by(by)
             if (
@@ -2797,10 +2797,10 @@ class PandasQueryCompiler(BaseQueryCompiler):
             message="Order of columns could be different from pandas",
         )
 
-        from pandas.core.reshape.pivot import _convert_by
+        from my_happy_pandas.core.reshape.pivot import _convert_by
 
         def __convert_by(by):
-            if isinstance(by, pandas.Index):
+            if isinstance(by, my_happy_pandas.Index):
                 return list(by)
             return _convert_by(by)
 
@@ -2817,7 +2817,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
         keys_columns = self.getitem_column_array(unique_keys)
 
         def applyier(df, other):
-            concated = pandas.concat([df, other], axis=1, copy=False)
+            concated = my_happy_pandas.concat([df, other], axis=1, copy=False)
             result = concated.pivot_table(
                 index=index,
                 values=values if len(values) > 0 else None,
@@ -2884,14 +2884,14 @@ class PandasQueryCompiler(BaseQueryCompiler):
         # than it would be to reuse the code for specific columns.
         if len(columns) == len(self.columns):
             new_modin_frame = self._modin_frame._apply_full_axis(
-                0, lambda df: pandas.get_dummies(df, **kwargs), new_index=self.index
+                0, lambda df: my_happy_pandas.get_dummies(df, **kwargs), new_index=self.index
             )
             untouched_frame = None
         else:
             new_modin_frame = self._modin_frame.mask(
                 col_indices=columns
             )._apply_full_axis(
-                0, lambda df: pandas.get_dummies(df, **kwargs), new_index=self.index
+                0, lambda df: my_happy_pandas.get_dummies(df, **kwargs), new_index=self.index
             )
             untouched_frame = self.drop(columns=columns)
         # If we mapped over all the data we are done. If not, we need to
@@ -2956,9 +2956,9 @@ class PandasQueryCompiler(BaseQueryCompiler):
             for col in columns
         }
         # Index may contain duplicates
-        broadcast_values1 = pandas.DataFrame(broadcast_value_dict, index=self.index)
+        broadcast_values1 = my_happy_pandas.DataFrame(broadcast_value_dict, index=self.index)
         # Index without duplicates
-        broadcast_values2 = pandas.DataFrame(broadcast_value_dict)
+        broadcast_values2 = my_happy_pandas.DataFrame(broadcast_value_dict)
         broadcast_values2 = broadcast_values2.reset_index(drop=True)
         # Index may contain duplicates
         new_index1 = broadcast_values1.sort_values(
@@ -3005,7 +3005,7 @@ class PandasQueryCompiler(BaseQueryCompiler):
             self.getitem_row_array([row]).to_pandas() for row in rows
         ]
         index_builder = list(zip(broadcast_value_list, rows))
-        broadcast_values = pandas.concat(
+        broadcast_values = my_happy_pandas.concat(
             [row for row, idx in index_builder], copy=False
         )
         broadcast_values.columns = self.columns

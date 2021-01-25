@@ -25,7 +25,7 @@ Manually add documentation for methods which are not presented in pandas.
 
 import sys
 import numpy as np
-import pandas
+import my_happy_pandas
 from my_happy_modin.utils import _inherit_docstrings
 from .series import Series
 
@@ -38,9 +38,9 @@ else:
 
 
 @_inherit_docstrings(
-    pandas.core.arrays.categorical.CategoricalAccessor,
+    my_happy_pandas.core.arrays.categorical.CategoricalAccessor,
     excluded=[
-        pandas.core.arrays.categorical.CategoricalAccessor.__init__,
+        my_happy_pandas.core.arrays.categorical.CategoricalAccessor.__init__,
     ],
 )
 class CategoryMethods(object):
@@ -50,7 +50,7 @@ class CategoryMethods(object):
 
     @property
     def categories(self):
-        return self._series._default_to_pandas(pandas.Series.cat).categories
+        return self._series._default_to_pandas(my_happy_pandas.Series.cat).categories
 
     @categories.setter
     def categories(self, categories):
@@ -61,7 +61,7 @@ class CategoryMethods(object):
 
     @property
     def ordered(self):
-        return self._series._default_to_pandas(pandas.Series.cat).ordered
+        return self._series._default_to_pandas(my_happy_pandas.Series.cat).ordered
 
     @property
     def codes(self):
@@ -69,12 +69,12 @@ class CategoryMethods(object):
 
     def rename_categories(self, new_categories, inplace=False):
         return self._default_to_pandas(
-            pandas.Series.cat.rename_categories, new_categories, inplace=inplace
+            my_happy_pandas.Series.cat.rename_categories, new_categories, inplace=inplace
         )
 
     def reorder_categories(self, new_categories, ordered=None, inplace=False):
         return self._default_to_pandas(
-            pandas.Series.cat.reorder_categories,
+            my_happy_pandas.Series.cat.reorder_categories,
             new_categories,
             ordered=ordered,
             inplace=inplace,
@@ -82,22 +82,22 @@ class CategoryMethods(object):
 
     def add_categories(self, new_categories, inplace=False):
         return self._default_to_pandas(
-            pandas.Series.cat.add_categories, new_categories, inplace=inplace
+            my_happy_pandas.Series.cat.add_categories, new_categories, inplace=inplace
         )
 
     def remove_categories(self, removals, inplace=False):
         return self._default_to_pandas(
-            pandas.Series.cat.remove_categories, removals, inplace=inplace
+            my_happy_pandas.Series.cat.remove_categories, removals, inplace=inplace
         )
 
     def remove_unused_categories(self, inplace=False):
         return self._default_to_pandas(
-            pandas.Series.cat.remove_unused_categories, inplace=inplace
+            my_happy_pandas.Series.cat.remove_unused_categories, inplace=inplace
         )
 
     def set_categories(self, new_categories, ordered=None, rename=False, inplace=False):
         return self._default_to_pandas(
-            pandas.Series.cat.set_categories,
+            my_happy_pandas.Series.cat.set_categories,
             new_categories,
             ordered=ordered,
             rename=rename,
@@ -105,10 +105,10 @@ class CategoryMethods(object):
         )
 
     def as_ordered(self, inplace=False):
-        return self._default_to_pandas(pandas.Series.cat.as_ordered, inplace=inplace)
+        return self._default_to_pandas(my_happy_pandas.Series.cat.as_ordered, inplace=inplace)
 
     def as_unordered(self, inplace=False):
-        return self._default_to_pandas(pandas.Series.cat.as_unordered, inplace=inplace)
+        return self._default_to_pandas(my_happy_pandas.Series.cat.as_unordered, inplace=inplace)
 
     def _default_to_pandas(self, op, *args, **kwargs):
         return self._series._default_to_pandas(
@@ -117,9 +117,9 @@ class CategoryMethods(object):
 
 
 @_inherit_docstrings(
-    pandas.core.strings.StringMethods,
+    my_happy_pandas.core.strings.StringMethods,
     excluded=[
-        pandas.core.strings.StringMethods.__init__,
+        my_happy_pandas.core.strings.StringMethods.__init__,
     ],
 )
 class StringMethods(object):
@@ -130,18 +130,18 @@ class StringMethods(object):
         self._query_compiler = series._query_compiler
 
     def casefold(self):
-        return self._default_to_pandas(pandas.Series.str.casefold)
+        return self._default_to_pandas(my_happy_pandas.Series.str.casefold)
 
     def cat(self, others=None, sep=None, na_rep=None, join=None):
         if isinstance(others, Series):
             others = others._to_pandas()
         return self._default_to_pandas(
-            pandas.Series.str.cat, others=others, sep=sep, na_rep=na_rep, join=join
+            my_happy_pandas.Series.str.cat, others=others, sep=sep, na_rep=na_rep, join=join
         )
 
     def decode(self, encoding, errors="strict"):
         return self._default_to_pandas(
-            pandas.Series.str.decode, encoding, errors=errors
+            my_happy_pandas.Series.str.decode, encoding, errors=errors
         )
 
     def split(self, pat=None, n=-1, expand=False):
@@ -150,7 +150,7 @@ class StringMethods(object):
 
         if expand:
             return self._default_to_pandas(
-                pandas.Series.str.split, pat=pat, n=n, expand=expand
+                my_happy_pandas.Series.str.split, pat=pat, n=n, expand=expand
             )
         else:
             return Series(
@@ -165,7 +165,7 @@ class StringMethods(object):
 
         if expand:
             return self._default_to_pandas(
-                pandas.Series.str.rsplit, pat=pat, n=n, expand=expand
+                my_happy_pandas.Series.str.rsplit, pat=pat, n=n, expand=expand
             )
         else:
             return Series(
@@ -183,7 +183,7 @@ class StringMethods(object):
         return Series(query_compiler=self._query_compiler.str_join(sep))
 
     def get_dummies(self, sep="|"):
-        return self._default_to_pandas(pandas.Series.str.get_dummies, sep=sep)
+        return self._default_to_pandas(my_happy_pandas.Series.str.get_dummies, sep=sep)
 
     def contains(self, pat, case=True, flags=0, na=np.NaN, regex=True):
         if pat is None and not case:
@@ -272,7 +272,7 @@ class StringMethods(object):
 
     def encode(self, encoding, errors="strict"):
         return self._default_to_pandas(
-            pandas.Series.str.encode, encoding, errors=errors
+            my_happy_pandas.Series.str.encode, encoding, errors=errors
         )
 
     def endswith(self, pat, na=np.NaN):
@@ -294,11 +294,11 @@ class StringMethods(object):
 
     def extract(self, pat, flags=0, expand=True):
         return self._default_to_pandas(
-            pandas.Series.str.extract, pat, flags=flags, expand=expand
+            my_happy_pandas.Series.str.extract, pat, flags=flags, expand=expand
         )
 
     def extractall(self, pat, flags=0):
-        return self._default_to_pandas(pandas.Series.str.extractall, pat, flags=flags)
+        return self._default_to_pandas(my_happy_pandas.Series.str.extractall, pat, flags=flags)
 
     def len(self):
         return Series(query_compiler=self._query_compiler.str_len())
@@ -318,7 +318,7 @@ class StringMethods(object):
 
         if expand:
             return self._default_to_pandas(
-                pandas.Series.str.partition, sep=sep, expand=expand
+                my_happy_pandas.Series.str.partition, sep=sep, expand=expand
             )
         else:
             return Series(
@@ -328,7 +328,7 @@ class StringMethods(object):
             )
 
     def repeat(self, repeats):
-        return self._default_to_pandas(pandas.Series.str.repeat, repeats)
+        return self._default_to_pandas(my_happy_pandas.Series.str.repeat, repeats)
 
     def rpartition(self, sep=" ", expand=True):
         if sep is not None and len(sep) == 0:
@@ -336,7 +336,7 @@ class StringMethods(object):
 
         if expand:
             return self._default_to_pandas(
-                pandas.Series.str.rpartition, sep=sep, expand=expand
+                my_happy_pandas.Series.str.rpartition, sep=sep, expand=expand
             )
         else:
             return Series(
@@ -436,9 +436,9 @@ class StringMethods(object):
 
 
 @_inherit_docstrings(
-    pandas.core.indexes.accessors.CombinedDatetimelikeProperties,
+    my_happy_pandas.core.indexes.accessors.CombinedDatetimelikeProperties,
     excluded=[
-        pandas.core.indexes.accessors.CombinedDatetimelikeProperties.__init__,
+        my_happy_pandas.core.indexes.accessors.CombinedDatetimelikeProperties.__init__,
     ],
 )
 class DatetimeProperties(object):
@@ -604,7 +604,7 @@ class DatetimeProperties(object):
 
     def to_pytimedelta(self):
         return self._query_compiler.default_to_pandas(
-            lambda df: pandas.Series.dt.to_pytimedelta(df.squeeze(axis=1).dt)
+            lambda df: my_happy_pandas.Series.dt.to_pytimedelta(df.squeeze(axis=1).dt)
         )
 
     @property

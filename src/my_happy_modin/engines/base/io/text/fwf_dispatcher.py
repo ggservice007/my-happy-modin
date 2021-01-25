@@ -13,8 +13,8 @@
 
 from my_happy_modin.engines.base.io.text.text_file_dispatcher import TextFileDispatcher
 from my_happy_modin.data_management.utils import compute_chunksize
-from pandas.io.parsers import _validate_usecols_arg
-import pandas
+from my_happy_pandas.io.parsers import _validate_usecols_arg
+import my_happy_pandas
 from csv import QUOTE_NONE
 import sys
 
@@ -69,11 +69,11 @@ class FWFDispatcher(TextFileDispatcher):
             # column names before we build the index. Because we pass `names` in, this
             # step has to happen without removing the `index_col` otherwise it will not
             # be assigned correctly
-            names = pandas.read_fwf(
+            names = my_happy_pandas.read_fwf(
                 filepath_or_buffer,
                 **dict(kwargs, usecols=None, nrows=0, skipfooter=0, index_col=None),
             ).columns
-        empty_pd_df = pandas.read_fwf(
+        empty_pd_df = my_happy_pandas.read_fwf(
             filepath_or_buffer, **dict(kwargs, nrows=0, skipfooter=0)
         )
         column_names = empty_pd_df.columns
@@ -83,7 +83,7 @@ class FWFDispatcher(TextFileDispatcher):
         usecols_md = _validate_usecols_arg(usecols)
         if usecols is not None and usecols_md[1] != "integer":
             del kwargs["usecols"]
-            all_cols = pandas.read_fwf(
+            all_cols = my_happy_pandas.read_fwf(
                 cls.file_open(filepath_or_buffer, "rb"),
                 **dict(kwargs, nrows=0, skipfooter=0),
             ).columns
@@ -123,7 +123,7 @@ class FWFDispatcher(TextFileDispatcher):
             index_ids = []
             dtypes_ids = []
             # Max number of partitions available
-            from my_happy_modin.pandas import DEFAULT_NPARTITIONS
+            from my_happy_modin.my_happy_pandas import DEFAULT_NPARTITIONS
 
             num_partitions = DEFAULT_NPARTITIONS
             # This is the number of splits for the columns
@@ -170,10 +170,10 @@ class FWFDispatcher(TextFileDispatcher):
         # or based on the column(s) that were requested.
         if index_col is None:
             row_lengths = cls.materialize(index_ids)
-            new_index = pandas.RangeIndex(sum(row_lengths))
+            new_index = my_happy_pandas.RangeIndex(sum(row_lengths))
             # pandas has a really weird edge case here.
             if kwargs.get("names", None) is not None and skiprows > 1:
-                new_index = pandas.RangeIndex(
+                new_index = my_happy_pandas.RangeIndex(
                     skiprows - 1, new_index.stop + skiprows - 1
                 )
         else:
@@ -208,10 +208,10 @@ class FWFDispatcher(TextFileDispatcher):
                 for new_col_name, group in parse_dates.items():
                     column_names = column_names.drop(group).insert(0, new_col_name)
         # Set the index for the dtypes to the column names
-        if isinstance(dtypes, pandas.Series):
+        if isinstance(dtypes, my_happy_pandas.Series):
             dtypes.index = column_names
         else:
-            dtypes = pandas.Series(dtypes, index=column_names)
+            dtypes = my_happy_pandas.Series(dtypes, index=column_names)
         new_frame = cls.frame_cls(
             partition_ids,
             new_index,

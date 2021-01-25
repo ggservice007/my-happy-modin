@@ -11,8 +11,8 @@
 # ANY KIND, either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-import pandas
-from pandas.core.arrays.sparse.dtype import SparseDtype
+import my_happy_pandas
+from my_happy_pandas.core.arrays.sparse.dtype import SparseDtype
 
 from my_happy_modin.utils import _inherit_docstrings
 
@@ -33,7 +33,7 @@ class BaseSparseAccessor:
         )
 
 
-@_inherit_docstrings(pandas.core.arrays.sparse.accessor.SparseFrameAccessor)
+@_inherit_docstrings(my_happy_pandas.core.arrays.sparse.accessor.SparseFrameAccessor)
 class SparseFrameAccessor(BaseSparseAccessor):
     def _validate(self, data):
         dtypes = data.dtypes
@@ -42,22 +42,22 @@ class SparseFrameAccessor(BaseSparseAccessor):
 
     @property
     def density(self):
-        return self._parent._default_to_pandas(pandas.DataFrame.sparse).density
+        return self._parent._default_to_pandas(my_happy_pandas.DataFrame.sparse).density
 
     @classmethod
     def from_spmatrix(cls, data, index=None, columns=None):
         return cls._default_to_pandas(
-            pandas.DataFrame.sparse.from_spmatrix, data, index=index, columns=columns
+            my_happy_pandas.DataFrame.sparse.from_spmatrix, data, index=index, columns=columns
         )
 
     def to_dense(self):
-        return self._default_to_pandas(pandas.DataFrame.sparse.to_dense)
+        return self._default_to_pandas(my_happy_pandas.DataFrame.sparse.to_dense)
 
     def to_coo(self):
-        return self._default_to_pandas(pandas.DataFrame.sparse.to_coo)
+        return self._default_to_pandas(my_happy_pandas.DataFrame.sparse.to_coo)
 
 
-@_inherit_docstrings(pandas.core.arrays.sparse.accessor.SparseAccessor)
+@_inherit_docstrings(my_happy_pandas.core.arrays.sparse.accessor.SparseAccessor)
 class SparseAccessor(BaseSparseAccessor):
     def _validate(self, data):
         if not isinstance(data.dtype, SparseDtype):
@@ -65,39 +65,39 @@ class SparseAccessor(BaseSparseAccessor):
 
     @property
     def density(self):
-        return self._parent._default_to_pandas(pandas.Series.sparse).density
+        return self._parent._default_to_pandas(my_happy_pandas.Series.sparse).density
 
     @property
     def fill_value(self):
-        return self._parent._default_to_pandas(pandas.Series.sparse).fill_value
+        return self._parent._default_to_pandas(my_happy_pandas.Series.sparse).fill_value
 
     @property
     def npoints(self):
-        return self._parent._default_to_pandas(pandas.Series.sparse).npoints
+        return self._parent._default_to_pandas(my_happy_pandas.Series.sparse).npoints
 
     @property
     def sp_values(self):
-        return self._parent._default_to_pandas(pandas.Series.sparse).sp_values
+        return self._parent._default_to_pandas(my_happy_pandas.Series.sparse).sp_values
 
     @classmethod
     def from_coo(cls, A, dense_index=False):
         return cls._default_to_pandas(
-            pandas.Series.sparse.from_coo, A, dense_index=dense_index
+            my_happy_pandas.Series.sparse.from_coo, A, dense_index=dense_index
         )
 
     def to_coo(self, row_levels=(0,), column_levels=(1,), sort_labels=False):
         return self._default_to_pandas(
-            pandas.Series.sparse.to_coo,
+            my_happy_pandas.Series.sparse.to_coo,
             row_levels=row_levels,
             column_levels=column_levels,
             sort_labels=sort_labels,
         )
 
     def to_dense(self):
-        return self._default_to_pandas(pandas.Series.sparse.to_dense)
+        return self._default_to_pandas(my_happy_pandas.Series.sparse.to_dense)
 
 
-@_inherit_docstrings(pandas.core.accessor.CachedAccessor)
+@_inherit_docstrings(my_happy_pandas.core.accessor.CachedAccessor)
 class CachedAccessor:
     def __init__(self, name: str, accessor) -> None:
         self._name = name

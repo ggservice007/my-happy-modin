@@ -48,7 +48,7 @@ def from_pandas(df):
 
     Parameters
     ----------
-    df: pandas.DataFrame
+    df: my_happy_pandas.DataFrame
         The pandas DataFrame to convert.
 
     Returns
@@ -101,7 +101,7 @@ def is_scalar(obj):
     bool
         True if given object is scalar and False otherwise.
     """
-    from pandas.api.types import is_scalar as pandas_is_scalar
+    from my_happy_pandas.api.types import is_scalar as pandas_is_scalar
     from .base import BasePandasDataset
 
     return not isinstance(obj, BasePandasDataset) and pandas_is_scalar(obj)

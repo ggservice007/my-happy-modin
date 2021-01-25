@@ -13,10 +13,10 @@
 
 from collections import OrderedDict
 import numpy as np
-import pandas
-from pandas.core.indexes.api import ensure_index, Index, RangeIndex
-from pandas.core.indexes.datetimes import DatetimeIndex
-from pandas.core.dtypes.common import is_numeric_dtype
+import my_happy_pandas
+from my_happy_pandas.core.indexes.api import ensure_index, Index, RangeIndex
+from my_happy_pandas.core.indexes.datetimes import DatetimeIndex
+from my_happy_pandas.core.dtypes.common import is_numeric_dtype
 from typing import Union
 
 from my_happy_modin.backends.pandas.query_compiler import PandasQueryCompiler
@@ -53,8 +53,8 @@ class BasePandasFrame(object):
         Parameters
         ----------
             partitions : A 2D NumPy array of partitions. Must contain partition objects.
-            index : The index object for the dataframe. Converts to a pandas.Index.
-            columns : The columns object for the dataframe. Converts to a pandas.Index.
+            index : The index object for the dataframe. Converts to a my_happy_pandas.Index.
+            columns : The columns object for the dataframe. Converts to a my_happy_pandas.Index.
             row_lengths : (optional) The lengths of each partition in the rows. The
                 "height" of each of the block partitions. Is computed if not provided.
             column_widths : (optional) The width of each partition in the columns. The
@@ -153,7 +153,7 @@ class BasePandasFrame(object):
         if len(self.columns) > 0:
             dtypes = self._map_reduce(0, map_func, reduce_func).to_pandas().iloc[0]
         else:
-            dtypes = pandas.Series([])
+            dtypes = my_happy_pandas.Series([])
         # reset name to None because we use "__reduced__" internally
         dtypes.name = None
         return dtypes
@@ -190,7 +190,7 @@ class BasePandasFrame(object):
 
         Returns
         -------
-            A pandas.Index object containing the row labels.
+            A my_happy_pandas.Index object containing the row labels.
         """
         return self._index_cache
 
@@ -199,7 +199,7 @@ class BasePandasFrame(object):
 
         Returns
         -------
-            A pandas.Index object containing the column labels.
+            A my_happy_pandas.Index object containing the column labels.
         """
         return self._columns_cache
 
@@ -281,7 +281,7 @@ class BasePandasFrame(object):
 
         Returns
         -------
-        Pandas.Index
+        my_happy_pandas.Index
             Labels for the specified `axis`
         """
         if partitions is None:
@@ -373,7 +373,7 @@ class BasePandasFrame(object):
         else:
             is_force = kwargs.get("force", False)
 
-        reduced_sample = pandas.Index(["__reduced__"])
+        reduced_sample = my_happy_pandas.Index(["__reduced__"])
 
         is_axis_reduced = [self.axes[i].equals(reduced_sample) for i in [0, 1]]
 
@@ -730,7 +730,7 @@ class BasePandasFrame(object):
         # the limited data seen by each worker. We use pandas to compute the exact dtype
         # over the whole column for each column.
         dtypes = (
-            pandas.concat(list_of_dtypes, axis=1)
+            my_happy_pandas.concat(list_of_dtypes, axis=1)
             .apply(lambda row: find_common_type(row.values), axis=1)
             .squeeze(axis=0)
         )
@@ -1076,7 +1076,7 @@ class BasePandasFrame(object):
 
         def _map_reduce_func(df, *args, **kwargs):
             series_result = func(df, *args, **kwargs)
-            if axis == 0 and isinstance(series_result, pandas.Series):
+            if axis == 0 and isinstance(series_result, my_happy_pandas.Series):
                 # In the case of axis=0, we need to keep the shape of the data
                 # consistent with what we have done. In the case of a reduction, the
                 # data for axis=0 should be a single value for each column. By
@@ -1085,8 +1085,8 @@ class BasePandasFrame(object):
                 # axis=1 does not have this requirement because the index already will
                 # line up with the index of the data based on how pandas creates a
                 # DataFrame from a Series.
-                return pandas.DataFrame(series_result).T
-            return pandas.DataFrame(series_result)
+                return my_happy_pandas.DataFrame(series_result).T
+            return my_happy_pandas.DataFrame(series_result)
 
         return _map_reduce_func
 
@@ -1119,7 +1119,7 @@ class BasePandasFrame(object):
         if axis == 0 or self._dtypes is None:
             new_dtypes = self._dtypes
         elif preserve_index:
-            new_dtypes = pandas.Series(
+            new_dtypes = my_happy_pandas.Series(
                 [find_common_type(self.dtypes.values)], index=new_axes[axis]
             )
         else:
@@ -1217,7 +1217,7 @@ class BasePandasFrame(object):
         if dtypes == "copy":
             dtypes = self._dtypes
         elif dtypes is not None:
-            dtypes = pandas.Series(
+            dtypes = my_happy_pandas.Series(
                 [np.dtype(dtypes)] * len(self.columns), index=self.columns
             )
 
@@ -1741,7 +1741,7 @@ class BasePandasFrame(object):
         if dtypes == "copy":
             dtypes = self._dtypes
         elif dtypes is not None:
-            dtypes = pandas.Series(
+            dtypes = my_happy_pandas.Series(
                 [np.dtype(dtypes)] * len(new_axes[1]), index=new_axes[1]
             )
         return self.__constructor__(
@@ -2094,7 +2094,7 @@ class BasePandasFrame(object):
         )
         new_columns = Index.__new__(Index, data=at.column_names, dtype="O")
         new_index = Index.__new__(RangeIndex, data=range(at.num_rows))
-        new_dtypes = pandas.Series(
+        new_dtypes = my_happy_pandas.Series(
             [cls._arrow_type_to_dtype(col.type) for col in at.columns],
             index=at.column_names,
         )
@@ -2124,9 +2124,9 @@ class BasePandasFrame(object):
         df = self._frame_mgr_cls.to_pandas(self._partitions)
         if df.empty:
             if len(self.columns) != 0:
-                df = pandas.DataFrame(columns=self.columns)
+                df = my_happy_pandas.DataFrame(columns=self.columns)
             else:
-                df = pandas.DataFrame(columns=self.columns, index=self.index)
+                df = my_happy_pandas.DataFrame(columns=self.columns, index=self.index)
         else:
             for axis in [0, 1]:
                 ErrorMessage.catch_bugs_and_request_email(
@@ -2158,7 +2158,7 @@ class BasePandasFrame(object):
         new_partitions = self._frame_mgr_cls.lazy_map_partitions(
             self._partitions, lambda df: df.T
         ).T
-        new_dtypes = pandas.Series(
+        new_dtypes = my_happy_pandas.Series(
             np.full(len(self.index), find_common_type(self.dtypes.values)),
             index=self.index,
         )

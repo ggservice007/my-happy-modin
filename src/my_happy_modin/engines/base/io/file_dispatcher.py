@@ -31,17 +31,17 @@ class FileDispatcher:
         # implementations.
         if Backend.get() != "Pandas":
             raise NotImplementedError("FIXME")
-        import pandas
+        import my_happy_pandas
 
         if hasattr(query_compiler, "dtypes") and any(
-            isinstance(t, pandas.CategoricalDtype) for t in query_compiler.dtypes
+            isinstance(t, my_happy_pandas.CategoricalDtype) for t in query_compiler.dtypes
         ):
             dtypes = query_compiler.dtypes
             return query_compiler.astype(
                 {
                     t: dtypes[t]
                     for t in dtypes.index
-                    if isinstance(dtypes[t], pandas.CategoricalDtype)
+                    if isinstance(dtypes[t], my_happy_pandas.CategoricalDtype)
                 }
             )
         return query_compiler

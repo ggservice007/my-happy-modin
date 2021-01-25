@@ -13,8 +13,8 @@
 
 from .any_default import AnyDefault
 
-import pandas
-from pandas.core.dtypes.common import is_list_like
+import my_happy_pandas
+from my_happy_pandas.core.dtypes.common import is_list_like
 
 
 class BinaryDefault(AnyDefault):
@@ -34,11 +34,11 @@ class BinaryDefault(AnyDefault):
 
             result = fn(df, other, *args, **kwargs)
             if (
-                not isinstance(result, pandas.Series)
-                and not isinstance(result, pandas.DataFrame)
+                not isinstance(result, my_happy_pandas.Series)
+                and not isinstance(result, my_happy_pandas.DataFrame)
                 and is_list_like(result)
             ):
-                result = pandas.DataFrame(result)
+                result = my_happy_pandas.DataFrame(result)
             return result
 
         return super().build_default_to_pandas(bin_ops_wrapper, fn_name)

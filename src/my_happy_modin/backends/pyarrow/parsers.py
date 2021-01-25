@@ -13,7 +13,7 @@
 
 from my_happy_modin.data_management.utils import get_default_chunksize
 from io import BytesIO
-import pandas
+import my_happy_pandas
 
 
 class PyarrowCSVParser:
@@ -42,7 +42,7 @@ class PyarrowCSVParser:
         ]
         return chunks + [
             table.num_rows,
-            pandas.Series(
+            my_happy_pandas.Series(
                 [t.to_pandas_dtype() for t in table.schema.types],
                 index=table.schema.names,
             ),

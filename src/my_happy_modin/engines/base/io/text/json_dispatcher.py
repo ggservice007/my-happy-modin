@@ -14,7 +14,7 @@
 from my_happy_modin.engines.base.io.text.text_file_dispatcher import TextFileDispatcher
 from my_happy_modin.data_management.utils import compute_chunksize
 from io import BytesIO
-import pandas
+import my_happy_pandas
 import numpy as np
 from csv import QUOTE_NONE
 
@@ -30,14 +30,14 @@ class JSONDispatcher(TextFileDispatcher):
             return cls.single_worker_read(path_or_buf, **kwargs)
         if not kwargs.get("lines", False):
             return cls.single_worker_read(path_or_buf, **kwargs)
-        columns = pandas.read_json(
+        columns = my_happy_pandas.read_json(
             BytesIO(b"" + open(path_or_buf, "rb").readline()), lines=True
         ).columns
         kwargs["columns"] = columns
-        empty_pd_df = pandas.DataFrame(columns=columns)
+        empty_pd_df = my_happy_pandas.DataFrame(columns=columns)
 
         with cls.file_open(path_or_buf, "rb", kwargs.get("compression", "infer")) as f:
-            from my_happy_modin.pandas import DEFAULT_NPARTITIONS
+            from my_happy_modin.my_happy_pandas import DEFAULT_NPARTITIONS
 
             num_partitions = DEFAULT_NPARTITIONS
             num_splits = min(len(columns), num_partitions)
@@ -75,15 +75,15 @@ class JSONDispatcher(TextFileDispatcher):
         # partition_id[-1] contains the columns for each partition, which will be useful
         # for implementing when `lines=False`.
         row_lengths = cls.materialize(index_ids)
-        new_index = pandas.RangeIndex(sum(row_lengths))
+        new_index = my_happy_pandas.RangeIndex(sum(row_lengths))
 
         dtypes = cls.get_dtypes(dtypes_ids)
         partition_ids = cls.build_partition(partition_ids, row_lengths, column_widths)
 
-        if isinstance(dtypes, pandas.Series):
+        if isinstance(dtypes, my_happy_pandas.Series):
             dtypes.index = columns
         else:
-            dtypes = pandas.Series(dtypes, index=columns)
+            dtypes = my_happy_pandas.Series(dtypes, index=columns)
 
         new_frame = cls.frame_cls(
             np.array(partition_ids),

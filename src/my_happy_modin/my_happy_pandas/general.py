@@ -20,12 +20,12 @@ for better maintability. So some codes are ignored in pydocstyle check:
 Manually add documentation for methods which are not presented in pandas.
 """
 
-import pandas
+import my_happy_pandas
 import numpy as np
 
 from typing import Hashable, Iterable, Mapping, Optional, Union
-from pandas._typing import FrameOrSeriesUnion
-from pandas.core.dtypes.common import is_list_like
+from my_happy_pandas._typing import FrameOrSeriesUnion
+from my_happy_pandas.core.dtypes.common import is_list_like
 
 from my_happy_modin.error_message import ErrorMessage
 from .base import BasePandasDataset
@@ -36,29 +36,29 @@ from my_happy_modin.backends.base.query_compiler import BaseQueryCompiler
 from my_happy_modin.utils import _inherit_docstrings
 
 
-@_inherit_docstrings(pandas.isna)
+@_inherit_docstrings(my_happy_pandas.isna)
 def isna(obj):
     if isinstance(obj, BasePandasDataset):
         return obj.isna()
     else:
-        return pandas.isna(obj)
+        return my_happy_pandas.isna(obj)
 
 
 isnull = isna
 
 
-@_inherit_docstrings(pandas.notna)
+@_inherit_docstrings(my_happy_pandas.notna)
 def notna(obj):
     if isinstance(obj, BasePandasDataset):
         return obj.notna()
     else:
-        return pandas.notna(obj)
+        return my_happy_pandas.notna(obj)
 
 
 notnull = notna
 
 
-@_inherit_docstrings(pandas.merge)
+@_inherit_docstrings(my_happy_pandas.merge)
 def merge(
     left,
     right,
@@ -101,7 +101,7 @@ def merge(
     )
 
 
-@_inherit_docstrings(pandas.merge_ordered)
+@_inherit_docstrings(my_happy_pandas.merge_ordered)
 def merge_ordered(
     left,
     right,
@@ -122,7 +122,7 @@ def merge_ordered(
     if isinstance(right, DataFrame):
         right = to_pandas(right)
     return DataFrame(
-        pandas.merge_ordered(
+        my_happy_pandas.merge_ordered(
             to_pandas(left),
             right,
             on=on,
@@ -137,7 +137,7 @@ def merge_ordered(
     )
 
 
-@_inherit_docstrings(pandas.merge_asof)
+@_inherit_docstrings(my_happy_pandas.merge_asof)
 def merge_asof(
     left,
     right,
@@ -185,7 +185,7 @@ def merge_asof(
         if isinstance(right, DataFrame):
             right = to_pandas(right)
         return DataFrame(
-            pandas.merge_asof(
+            my_happy_pandas.merge_asof(
                 to_pandas(left),
                 right,
                 on=on,
@@ -251,12 +251,12 @@ def merge_asof(
 
     # 1. Construct Pandas DataFrames with just the 'on' and optional 'by'
     # columns, and the index as another column.
-    left_pandas_limited = pandas.DataFrame(left_pandas_limited, index=left.index)
-    right_pandas_limited = pandas.DataFrame(right_pandas_limited)
+    left_pandas_limited = my_happy_pandas.DataFrame(left_pandas_limited, index=left.index)
+    right_pandas_limited = my_happy_pandas.DataFrame(right_pandas_limited)
 
     # 2. Use Pandas' merge_asof to figure out how to map labels on left to
     # labels on the right.
-    merged = pandas.merge_asof(
+    merged = my_happy_pandas.merge_asof(
         left_pandas_limited,
         right_pandas_limited,
         on="on",
@@ -269,7 +269,7 @@ def merge_asof(
 
     # 3. Re-index right using the merged["right_labels"]; at this point right
     # should be same length and (semantically) same order as left:
-    right_subset = right.reindex(index=pandas.Index(merged["right_labels"]))
+    right_subset = right.reindex(index=my_happy_pandas.Index(merged["right_labels"]))
     if not right_index:
         right_subset.drop(columns=[right_on], inplace=True)
     if right_by is not None and left_by == right_by:
@@ -295,12 +295,12 @@ def merge_asof(
             result[left_on + suffixes[0]],
         )
     if not left_index and not right_index:
-        result.index = pandas.RangeIndex(start=0, stop=len(result))
+        result.index = my_happy_pandas.RangeIndex(start=0, stop=len(result))
 
     return result
 
 
-@_inherit_docstrings(pandas.pivot_table)
+@_inherit_docstrings(my_happy_pandas.pivot_table)
 def pivot_table(
     data,
     values=None,
@@ -330,26 +330,26 @@ def pivot_table(
     )
 
 
-@_inherit_docstrings(pandas.pivot)
+@_inherit_docstrings(my_happy_pandas.pivot)
 def pivot(data, index=None, columns=None, values=None):
     if not isinstance(data, DataFrame):
         raise ValueError("can not pivot with instance of type {}".format(type(data)))
     return data.pivot(index=index, columns=columns, values=values)
 
 
-@_inherit_docstrings(pandas.to_numeric)
+@_inherit_docstrings(my_happy_pandas.to_numeric)
 def to_numeric(arg, errors="raise", downcast=None):
     if not isinstance(arg, Series):
-        return pandas.to_numeric(arg, errors=errors, downcast=downcast)
+        return my_happy_pandas.to_numeric(arg, errors=errors, downcast=downcast)
     return arg._to_numeric(errors=errors, downcast=downcast)
 
 
-@_inherit_docstrings(pandas.unique)
+@_inherit_docstrings(my_happy_pandas.unique)
 def unique(values):
     return Series(values).unique()
 
 
-@_inherit_docstrings(pandas.value_counts)
+@_inherit_docstrings(my_happy_pandas.value_counts)
 def value_counts(
     values, sort=True, ascending=False, normalize=False, bins=None, dropna=True
 ):
@@ -362,7 +362,7 @@ def value_counts(
     )
 
 
-@_inherit_docstrings(pandas.concat)
+@_inherit_docstrings(my_happy_pandas.concat)
 def concat(
     objs: Union[
         Iterable[FrameOrSeriesUnion], Mapping[Optional[Hashable], FrameOrSeriesUnion]
@@ -377,13 +377,13 @@ def concat(
     sort: bool = False,
     copy: bool = True,
 ) -> FrameOrSeriesUnion:
-    if isinstance(objs, (pandas.Series, Series, DataFrame, str, pandas.DataFrame)):
+    if isinstance(objs, (my_happy_pandas.Series, Series, DataFrame, str, my_happy_pandas.DataFrame)):
         raise TypeError(
             "first argument must be an iterable of pandas "
             "objects, you passed an object of type "
             '"{name}"'.format(name=type(objs).__name__)
         )
-    axis = pandas.DataFrame()._get_axis_number(axis)
+    axis = my_happy_pandas.DataFrame()._get_axis_number(axis)
     if isinstance(objs, dict):
         list_of_objs = list(objs.values())
     else:
@@ -399,15 +399,15 @@ def concat(
         type_check = next(
             obj
             for obj in list_of_objs
-            if not isinstance(obj, (pandas.Series, Series, pandas.DataFrame, DataFrame))
+            if not isinstance(obj, (my_happy_pandas.Series, Series, my_happy_pandas.DataFrame, DataFrame))
         )
     except StopIteration:
         type_check = None
     if type_check is not None:
         raise ValueError(
             'cannot concatenate object of type "{0}"; only '
-            "my_happy_modin.pandas.Series "
-            "and my_happy_modin.pandas.DataFrame objs are "
+            "my_happy_modin.my_happy_pandas.Series "
+            "and my_happy_modin.my_happy_pandas.DataFrame objs are "
             "valid",
             type(type_check),
         )
@@ -439,7 +439,7 @@ def concat(
         obj
         if isinstance(obj, DataFrame)
         else DataFrame(obj.rename())
-        if isinstance(obj, (pandas.Series, Series)) and axis == 0
+        if isinstance(obj, (my_happy_pandas.Series, Series)) and axis == 0
         else DataFrame(obj)
         for obj in list_of_objs
     ]
@@ -465,7 +465,7 @@ def concat(
                 for k, obj in new_idx_labels.items()
                 for o in obj
             ]
-            new_idx = pandas.MultiIndex.from_tuples(tuples)
+            new_idx = my_happy_pandas.MultiIndex.from_tuples(tuples)
             if names is not None:
                 new_idx.names = names
             else:
@@ -473,8 +473,8 @@ def concat(
                 if old_name is not None:
                     new_idx.names = [None] + old_name
     elif isinstance(objs, dict):
-        new_idx = pandas.concat(
-            {k: pandas.Series(index=obj.axes[axis]) for k, obj in objs.items()}
+        new_idx = my_happy_pandas.concat(
+            {k: my_happy_pandas.Series(index=obj.axes[axis]) for k, obj in objs.items()}
         ).index
     else:
         new_idx = None
@@ -500,7 +500,7 @@ def concat(
     return result_df
 
 
-@_inherit_docstrings(pandas.to_datetime)
+@_inherit_docstrings(my_happy_pandas.to_datetime)
 def to_datetime(
     arg,
     errors="raise",
@@ -515,7 +515,7 @@ def to_datetime(
     cache=True,
 ):
     if not isinstance(arg, (DataFrame, Series)):
-        return pandas.to_datetime(
+        return my_happy_pandas.to_datetime(
             arg,
             errors=errors,
             dayfirst=dayfirst,
@@ -542,7 +542,7 @@ def to_datetime(
     )
 
 
-@_inherit_docstrings(pandas.get_dummies)
+@_inherit_docstrings(my_happy_pandas.get_dummies)
 def get_dummies(
     data,
     prefix=None,
@@ -564,7 +564,7 @@ def get_dummies(
         if isinstance(data, Series):
             data = data._to_pandas()
         return DataFrame(
-            pandas.get_dummies(
+            my_happy_pandas.get_dummies(
                 data,
                 prefix=prefix,
                 prefix_sep=prefix_sep,
@@ -587,7 +587,7 @@ def get_dummies(
         return DataFrame(query_compiler=new_manager)
 
 
-@_inherit_docstrings(pandas.melt)
+@_inherit_docstrings(my_happy_pandas.melt)
 def melt(
     frame,
     id_vars=None,
@@ -607,7 +607,7 @@ def melt(
     )
 
 
-@_inherit_docstrings(pandas.crosstab)
+@_inherit_docstrings(my_happy_pandas.crosstab)
 def crosstab(
     index,
     columns,
@@ -621,7 +621,7 @@ def crosstab(
     normalize=False,
 ) -> DataFrame:
     ErrorMessage.default_to_pandas("`crosstab`")
-    pandas_crosstab = pandas.crosstab(
+    pandas_crosstab = my_happy_pandas.crosstab(
         index,
         columns,
         values,
@@ -636,17 +636,17 @@ def crosstab(
     return DataFrame(pandas_crosstab)
 
 
-@_inherit_docstrings(pandas.lreshape)
+@_inherit_docstrings(my_happy_pandas.lreshape)
 def lreshape(data: DataFrame, groups, dropna=True, label=None):
     if not isinstance(data, DataFrame):
         raise ValueError("can not lreshape with instance of type {}".format(type(data)))
     ErrorMessage.default_to_pandas("`lreshape`")
     return DataFrame(
-        pandas.lreshape(to_pandas(data), groups, dropna=dropna, label=label)
+        my_happy_pandas.lreshape(to_pandas(data), groups, dropna=dropna, label=label)
     )
 
 
-@_inherit_docstrings(pandas.wide_to_long)
+@_inherit_docstrings(my_happy_pandas.wide_to_long)
 def wide_to_long(
     df: DataFrame, stubnames, i, j, sep: str = "", suffix: str = r"\d+"
 ) -> DataFrame:
@@ -656,7 +656,7 @@ def wide_to_long(
         )
     ErrorMessage.default_to_pandas("`wide_to_long`")
     return DataFrame(
-        pandas.wide_to_long(to_pandas(df), stubnames, i, j, sep=sep, suffix=suffix)
+        my_happy_pandas.wide_to_long(to_pandas(df), stubnames, i, j, sep=sep, suffix=suffix)
     )
 
 
@@ -675,7 +675,7 @@ def _determine_name(objs: Iterable[BaseQueryCompiler], axis: Union[int, str]):
     `list` with single element - computed index name, `None` if it could not
     be determined
     """
-    axis = pandas.DataFrame()._get_axis_number(axis)
+    axis = my_happy_pandas.DataFrame()._get_axis_number(axis)
 
     def get_names(obj):
         return obj.columns.names if axis else obj.index.names

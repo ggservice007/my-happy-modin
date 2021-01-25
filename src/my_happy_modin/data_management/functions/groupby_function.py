@@ -11,7 +11,7 @@
 # ANY KIND, either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-import pandas
+import my_happy_pandas
 
 from .mapreducefunction import MapReduceFunction
 from my_happy_modin.utils import try_cast_to_pandas, hashable
@@ -49,8 +49,8 @@ class GroupbyReduceFunction(MapReduceFunction):
         groupby_args["observed"] = True
         if other is not None:
             other = other.squeeze(axis=axis ^ 1)
-            if isinstance(other, pandas.DataFrame):
-                df = pandas.concat(
+            if isinstance(other, my_happy_pandas.DataFrame):
+                df = my_happy_pandas.concat(
                     [df] + [other[[o for o in other if o not in df]]],
                     axis=1,
                 )
@@ -114,7 +114,7 @@ class GroupbyReduceFunction(MapReduceFunction):
         **kwargs,
     ):
         if not (isinstance(by, (type(query_compiler)) or hashable(by))) or isinstance(
-            by, pandas.Grouper
+            by, my_happy_pandas.Grouper
         ):
             by = try_cast_to_pandas(by, squeeze=True)
             default_func = (
@@ -254,7 +254,7 @@ groupby_reduce_functions = {
         lambda df, *args, **kwargs: df.prod(*args, **kwargs),
     ),
     "size": (
-        lambda df, *args, **kwargs: pandas.DataFrame(df.size(*args, **kwargs)),
+        lambda df, *args, **kwargs: my_happy_pandas.DataFrame(df.size(*args, **kwargs)),
         lambda df, *args, **kwargs: df.sum(*args, **kwargs),
     ),
     "sum": (

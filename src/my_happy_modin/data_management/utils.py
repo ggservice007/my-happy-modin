@@ -12,7 +12,7 @@
 # governing permissions and limitations under the License.
 
 import numpy as np
-import pandas
+import my_happy_pandas
 
 
 def get_default_chunksize(length, num_splits):
@@ -71,7 +71,7 @@ def split_result_of_axis_func_pandas(axis, num_splits, result, length_list=None)
             The axis to split across (0 - index, 1 - columns).
         num_splits : int
             The number of even splits to create.
-        result : pandas.DataFrame
+        result : my_happy_pandas.DataFrame
             The result of the computation. This should be a Pandas DataFrame.
         length_list : list
             The list of lengths to split this DataFrame into. This is used to
@@ -85,7 +85,7 @@ def split_result_of_axis_func_pandas(axis, num_splits, result, length_list=None)
     if length_list is not None:
         length_list.insert(0, 0)
         sums = np.cumsum(length_list)
-        if axis == 0 or isinstance(result, pandas.Series):
+        if axis == 0 or isinstance(result, my_happy_pandas.Series):
             return [result.iloc[sums[i] : sums[i + 1]] for i in range(len(sums) - 1)]
         else:
             return [result.iloc[:, sums[i] : sums[i + 1]] for i in range(len(sums) - 1)]
@@ -94,7 +94,7 @@ def split_result_of_axis_func_pandas(axis, num_splits, result, length_list=None)
         return [result]
     # We do this to restore block partitioning
     chunksize = compute_chunksize(result, num_splits, axis=axis)
-    if axis == 0 or isinstance(result, pandas.Series):
+    if axis == 0 or isinstance(result, my_happy_pandas.Series):
         return [
             result.iloc[chunksize * i : chunksize * (i + 1)] for i in range(num_splits)
         ]
@@ -106,10 +106,10 @@ def split_result_of_axis_func_pandas(axis, num_splits, result, length_list=None)
 
 
 def length_fn_pandas(df):
-    assert isinstance(df, pandas.DataFrame)
+    assert isinstance(df, my_happy_pandas.DataFrame)
     return len(df) if len(df) > 0 else 0
 
 
 def width_fn_pandas(df):
-    assert isinstance(df, pandas.DataFrame)
+    assert isinstance(df, my_happy_pandas.DataFrame)
     return len(df.columns) if len(df.columns) > 0 else 0

@@ -29,10 +29,10 @@ https://github.com/ray-project/ray/pull/1955#issuecomment-386781826
 """
 
 import numpy as np
-import pandas
-from pandas.api.types import is_list_like, is_bool
-from pandas.core.dtypes.common import is_integer
-from pandas.core.indexing import IndexingError
+import my_happy_pandas
+from my_happy_pandas.api.types import is_list_like, is_bool
+from my_happy_pandas.core.dtypes.common import is_integer
+from my_happy_pandas.core.indexing import IndexingError
 
 from .dataframe import DataFrame
 from .series import Series
@@ -384,7 +384,7 @@ class _LocationIndexerBase(object):
         """
         # It is valid to pass a DataFrame or Series to __setitem__ that is larger than
         # the target the user is trying to overwrite. This
-        if isinstance(item, (pandas.Series, pandas.DataFrame, Series, DataFrame)):
+        if isinstance(item, (my_happy_pandas.Series, my_happy_pandas.DataFrame, Series, DataFrame)):
             # convert indices in lookups to names, as Pandas reindex expects them to be so
             index_values = self.qc.index[row_lookup]
             if not all(idx in item.index for idx in index_values):
@@ -529,14 +529,14 @@ class _LocIndexer(_LocationIndexerBase):
         if any(i == -1 for i in row_lookup) or any(i == -1 for i in col_lookup):
             raise KeyError(
                 "Passing list-likes to .loc or [] with any missing labels is no longer "
-                "supported, see https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#deprecate-loc-reindex-listlike"
+                "supported, see https://my_happy_pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#deprecate-loc-reindex-listlike"
             )
         result = super(_LocIndexer, self).__getitem__(row_lookup, col_lookup, ndim)
         if isinstance(result, Series):
             result._parent = self.df
             result._parent_axis = 0
         # Pandas drops the levels that are in the `loc`, so we have to as well.
-        if hasattr(result, "index") and isinstance(result.index, pandas.MultiIndex):
+        if hasattr(result, "index") and isinstance(result.index, my_happy_pandas.MultiIndex):
             if (
                 isinstance(result, Series)
                 and not isinstance(col_loc, slice)
@@ -554,7 +554,7 @@ class _LocIndexer(_LocationIndexerBase):
         if (
             hasattr(result, "columns")
             and not isinstance(col_loc, slice)
-            and isinstance(result.columns, pandas.MultiIndex)
+            and isinstance(result.columns, my_happy_pandas.MultiIndex)
             and all(col_loc[i] in result.columns.levels[i] for i in range(len(col_loc)))
         ):
             result.columns = result.columns.droplevel(list(range(len(col_loc))))
@@ -564,7 +564,7 @@ class _LocIndexer(_LocationIndexerBase):
             row_lookup is not None
             and isinstance(col_loc, slice)
             and col_loc == slice(None)
-            and isinstance(key, pandas.Index)
+            and isinstance(key, my_happy_pandas.Index)
         ):
             result.index = key
         return result
@@ -599,7 +599,7 @@ class _LocIndexer(_LocationIndexerBase):
             and len(col_loc) == 1
             and col_loc[0] not in self.qc.columns
         ):
-            new_col = pandas.Series(index=self.df.index)
+            new_col = my_happy_pandas.Series(index=self.df.index)
             new_col[row_loc] = item
             self.df.insert(loc=len(self.df.columns), column=col_loc[0], value=new_col)
             self.qc = self.df._query_compiler
@@ -665,14 +665,14 @@ class _LocIndexer(_LocationIndexerBase):
                 isinstance(self.qc.index.values[0], np.datetime64)
                 and type(row_loc[0]) != np.datetime64
             ):
-                row_loc = [pandas.to_datetime(row_loc[0])]
+                row_loc = [my_happy_pandas.to_datetime(row_loc[0])]
 
         if isinstance(row_loc, slice):
             row_lookup = self.qc.index.get_indexer_for(
                 self.qc.index.to_series().loc[row_loc]
             )
         elif self.qc.has_multiindex():
-            if isinstance(row_loc, pandas.MultiIndex):
+            if isinstance(row_loc, my_happy_pandas.MultiIndex):
                 row_lookup = self.qc.index.get_indexer_for(row_loc)
             else:
                 row_lookup = self.qc.index.get_locs(row_loc)
@@ -686,7 +686,7 @@ class _LocIndexer(_LocationIndexerBase):
                 self.qc.columns.to_series().loc[col_loc]
             )
         elif self.qc.has_multiindex(axis=1):
-            if isinstance(col_loc, pandas.MultiIndex):
+            if isinstance(col_loc, my_happy_pandas.MultiIndex):
                 col_lookup = self.qc.columns.get_indexer_for(col_loc)
             else:
                 col_lookup = self.qc.columns.get_locs(col_loc)
@@ -788,7 +788,7 @@ class _iLocIndexer(_LocationIndexerBase):
             and row_loc.step is not None
         ):
             row_lookup = (
-                pandas.RangeIndex(len(self.qc.index)).to_series().iloc[row_loc].index
+                my_happy_pandas.RangeIndex(len(self.qc.index)).to_series().iloc[row_loc].index
             )
         else:
             row_lookup = row_loc
@@ -798,7 +798,7 @@ class _iLocIndexer(_LocationIndexerBase):
             and col_loc.step is not None
         ):
             col_lookup = (
-                pandas.RangeIndex(len(self.qc.columns)).to_series().iloc[col_loc].index
+                my_happy_pandas.RangeIndex(len(self.qc.columns)).to_series().iloc[col_loc].index
             )
         else:
             col_lookup = col_loc

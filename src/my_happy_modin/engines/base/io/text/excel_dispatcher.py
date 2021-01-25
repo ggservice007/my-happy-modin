@@ -11,7 +11,7 @@
 # ANY KIND, either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-import pandas
+import my_happy_pandas
 import re
 import sys
 import warnings
@@ -98,7 +98,7 @@ class ExcelDispatcher(TextFileDispatcher):
             f = BytesIO(f.read())
             total_bytes = cls.file_size(f)
 
-            from my_happy_modin.pandas import DEFAULT_NPARTITIONS
+            from my_happy_modin.my_happy_pandas import DEFAULT_NPARTITIONS
 
             num_partitions = DEFAULT_NPARTITIONS
             # Read some bytes from the sheet so we can extract the XML header and first
@@ -125,7 +125,7 @@ class ExcelDispatcher(TextFileDispatcher):
                 ws, kwargs.get("convert_float", True)
             )
             # Extract column names from parsed data.
-            column_names = pandas.Index(data[0])
+            column_names = my_happy_pandas.Index(data[0])
             index_col = kwargs.get("index_col", None)
             # Remove column names that are specified as `index_col`
             if index_col is not None:
@@ -134,7 +134,7 @@ class ExcelDispatcher(TextFileDispatcher):
             if not all(column_names):
                 # some column names are empty, use pandas reader to take the names from it
                 pandas_kw["nrows"] = 1
-                df = pandas.read_excel(io, **pandas_kw)
+                df = my_happy_pandas.read_excel(io, **pandas_kw)
                 column_names = df.columns
 
             # Compute partition metadata upfront so it is uniform for all partitions
@@ -150,7 +150,7 @@ class ExcelDispatcher(TextFileDispatcher):
 
             # Compute column metadata
             column_chunksize = compute_chunksize(
-                pandas.DataFrame(columns=column_names), num_splits, axis=1
+                my_happy_pandas.DataFrame(columns=column_names), num_splits, axis=1
             )
             if column_chunksize > len(column_names):
                 column_widths = [len(column_names)]
@@ -205,7 +205,7 @@ class ExcelDispatcher(TextFileDispatcher):
         # or based on the column(s) that were requested.
         if index_col is None:
             row_lengths = cls.materialize(index_ids)
-            new_index = pandas.RangeIndex(sum(row_lengths))
+            new_index = my_happy_pandas.RangeIndex(sum(row_lengths))
         else:
             index_objs = cls.materialize(index_ids)
             row_lengths = [len(o) for o in index_objs]
@@ -219,10 +219,10 @@ class ExcelDispatcher(TextFileDispatcher):
 
         data_ids = cls.build_partition(data_ids, row_lengths, column_widths)
         # Set the index for the dtypes to the column names
-        if isinstance(dtypes, pandas.Series):
+        if isinstance(dtypes, my_happy_pandas.Series):
             dtypes.index = column_names
         else:
-            dtypes = pandas.Series(dtypes, index=column_names)
+            dtypes = my_happy_pandas.Series(dtypes, index=column_names)
         new_frame = cls.frame_cls(
             data_ids,
             new_index,

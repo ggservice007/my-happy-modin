@@ -11,7 +11,7 @@
 # ANY KIND, either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-import pandas
+import my_happy_pandas
 
 from my_happy_modin.engines.base.io.column_stores.column_store_dispatcher import (
     ColumnStoreDispatcher,
@@ -22,7 +22,7 @@ from my_happy_modin.error_message import ErrorMessage
 class HDFDispatcher(ColumnStoreDispatcher):  # pragma: no cover
     @classmethod
     def _validate_hdf_format(cls, path_or_buf):
-        s = pandas.HDFStore(path_or_buf)
+        s = my_happy_pandas.HDFStore(path_or_buf)
         groups = s.groups()
         if len(groups) == 0:
             raise ValueError("No dataset in HDF5 file.")
@@ -37,8 +37,8 @@ class HDFDispatcher(ColumnStoreDispatcher):  # pragma: no cover
 
         Args:
             path: string, buffer or path object
-                Path to the file to open, or an open :class:`pandas.HDFStore` object.
-            kwargs: Pass into pandas.read_hdf function.
+                Path to the file to open, or an open :class:`my_happy_pandas.HDFStore` object.
+            kwargs: Pass into my_happy_pandas.read_hdf function.
 
         Returns:
             DataFrame constructed from the h5 file.
@@ -56,7 +56,7 @@ class HDFDispatcher(ColumnStoreDispatcher):  # pragma: no cover
         if not columns:
             start = kwargs.pop("start", None)
             stop = kwargs.pop("stop", None)
-            empty_pd_df = pandas.read_hdf(path_or_buf, start=0, stop=0, **kwargs)
+            empty_pd_df = my_happy_pandas.read_hdf(path_or_buf, start=0, stop=0, **kwargs)
             if start is not None:
                 kwargs["start"] = start
             if stop is not None:

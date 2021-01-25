@@ -14,8 +14,8 @@
 from my_happy_modin.data_management.functions.function import Function
 from my_happy_modin.utils import try_cast_to_pandas
 
-from pandas.core.dtypes.common import is_list_like
-import pandas
+from my_happy_pandas.core.dtypes.common import is_list_like
+import my_happy_pandas
 
 
 class DefaultMethod(Function):
@@ -23,7 +23,7 @@ class DefaultMethod(Function):
 
     @classmethod
     def call(cls, func, **call_kwds):
-        obj = call_kwds.get("obj_type", pandas.DataFrame)
+        obj = call_kwds.get("obj_type", my_happy_pandas.DataFrame)
         force_inplace = call_kwds.get("inplace")
         fn_name = call_kwds.get("fn_name", getattr(func, "__name__", str(func)))
 
@@ -40,17 +40,17 @@ class DefaultMethod(Function):
             result = fn(df, *args, **kwargs)
 
             if (
-                not isinstance(result, pandas.Series)
-                and not isinstance(result, pandas.DataFrame)
+                not isinstance(result, my_happy_pandas.Series)
+                and not isinstance(result, my_happy_pandas.DataFrame)
                 and func != "to_numpy"
-                and func != pandas.DataFrame.to_numpy
+                and func != my_happy_pandas.DataFrame.to_numpy
             ):
                 result = (
-                    pandas.DataFrame(result)
+                    my_happy_pandas.DataFrame(result)
                     if is_list_like(result)
-                    else pandas.DataFrame([result])
+                    else my_happy_pandas.DataFrame([result])
                 )
-            if isinstance(result, pandas.Series):
+            if isinstance(result, my_happy_pandas.Series):
                 if result.name is None:
                     result.name = "__reduced__"
                 result = result.to_frame()

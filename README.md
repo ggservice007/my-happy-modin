@@ -6,9 +6,9 @@ The simple version for modin.
 
 ## Features
 
-### Only Support Ray
+1. Only Support Ray
 
-### Replace pandas with my-happy-pandas
+1. Replace pandas with my-happy-pandas
 
 
 ## test and developing environment
@@ -20,6 +20,14 @@ python:  3.7.7
 ## install
 ```shell
 python3.7 -m pip install -i https://pypi.org/simple/ -U my-happy-modin
+
+python3.7 -m pip install -U my-happy-modin
 ```
+
+## uninstall
+```shell
+python3.7 -m pip uninstall my-happy-modin
+```
+
 
 ## dependency

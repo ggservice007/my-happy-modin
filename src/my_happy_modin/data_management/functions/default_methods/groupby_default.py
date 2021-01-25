@@ -13,31 +13,31 @@
 
 from .default import DefaultMethod
 
-import pandas
+import my_happy_pandas
 
 
 class GroupBy:
     agg_aliases = [
         "agg",
         "dict_agg",
-        pandas.core.groupby.DataFrameGroupBy.agg,
-        pandas.core.groupby.DataFrameGroupBy.aggregate,
+        my_happy_pandas.core.groupby.DataFrameGroupBy.agg,
+        my_happy_pandas.core.groupby.DataFrameGroupBy.aggregate,
     ]
 
     @classmethod
     def validate_by(cls, by):
         def try_cast_series(df):
-            if isinstance(df, pandas.DataFrame):
+            if isinstance(df, my_happy_pandas.DataFrame):
                 df = df.squeeze(axis=1)
-            if not isinstance(df, pandas.Series):
+            if not isinstance(df, my_happy_pandas.Series):
                 return df
             if df.name == "__reduced__":
                 df.name = None
             return df
 
-        if isinstance(by, pandas.DataFrame):
+        if isinstance(by, my_happy_pandas.DataFrame):
             by = [try_cast_series(column) for _, column in by.items()]
-        elif isinstance(by, pandas.Series):
+        elif isinstance(by, my_happy_pandas.Series):
             by = [try_cast_series(by)]
         elif isinstance(by, list):
             by = [try_cast_series(o) for o in by]
@@ -99,7 +99,7 @@ class GroupBy:
             drop=False,
             **kwargs
         ):
-            if not isinstance(by, (pandas.Series, pandas.DataFrame)):
+            if not isinstance(by, (my_happy_pandas.Series, my_happy_pandas.DataFrame)):
                 by = cls.validate_by(by)
                 return agg_func(
                     df.groupby(by=by, axis=axis, **groupby_args), **map_args
@@ -111,13 +111,13 @@ class GroupBy:
             by = by.squeeze(axis=1)
             if (
                 drop
-                and isinstance(by, pandas.Series)
+                and isinstance(by, my_happy_pandas.Series)
                 and by.name in df
                 and df[by.name].equals(by)
             ):
                 by = by.name
-            if isinstance(by, pandas.DataFrame):
-                df = pandas.concat([df] + [by[[o for o in by if o not in df]]], axis=1)
+            if isinstance(by, my_happy_pandas.DataFrame):
+                df = my_happy_pandas.concat([df] + [by[[o for o in by if o not in df]]], axis=1)
                 by = list(by.columns)
 
             groupby_args = groupby_args.copy()
@@ -127,7 +127,7 @@ class GroupBy:
             grp = df.groupby(by, axis=axis, **groupby_args)
             result = agg_func(grp, **map_args)
 
-            if isinstance(result, pandas.Series):
+            if isinstance(result, my_happy_pandas.Series):
                 result = result.to_frame()
 
             if not as_index:

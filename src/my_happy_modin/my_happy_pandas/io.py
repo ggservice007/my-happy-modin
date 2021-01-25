@@ -23,12 +23,12 @@ Manually add documentation for methods which are not presented in pandas.
 """
 
 import inspect
-import pandas
+import my_happy_pandas
 import pathlib
 import re
 from collections import OrderedDict
 from typing import Union, IO, AnyStr, Sequence, Dict, List, Optional, Any
-from pandas._typing import FilePathOrBuffer
+from my_happy_pandas._typing import FilePathOrBuffer
 
 from my_happy_modin.error_message import ErrorMessage
 from .dataframe import DataFrame
@@ -105,7 +105,7 @@ def _make_parser_func(sep):
     ):
         # ISSUE #2408: parse parameter shared with pandas read_csv and read_table and update with provided args
         _pd_read_csv_signature = {
-            val.name for val in inspect.signature(pandas.read_csv).parameters.values()
+            val.name for val in inspect.signature(my_happy_pandas.read_csv).parameters.values()
         }
         _, _, _, f_locals = inspect.getargvalues(inspect.currentframe())
         if f_locals.get("sep", sep) is False:
@@ -126,13 +126,13 @@ def _read(**kwargs):
     filepath_or_buffer:
         The filepath of the csv file.
         We only support local files for now.
-    kwargs: Keyword arguments in pandas.read_csv
+    kwargs: Keyword arguments in my_happy_pandas.read_csv
     """
     from my_happy_modin.data_management.factories.dispatcher import EngineDispatcher
 
     pd_obj = EngineDispatcher.read_csv(**kwargs)
     # This happens when `read_csv` returns a TextFileReader object for iterating through
-    if isinstance(pd_obj, pandas.io.parsers.TextFileReader):
+    if isinstance(pd_obj, my_happy_pandas.io.parsers.TextFileReader):
         reader = pd_obj.read
         pd_obj.read = lambda *args, **kwargs: DataFrame(
             query_compiler=reader(*args, **kwargs)
@@ -141,11 +141,11 @@ def _read(**kwargs):
     return DataFrame(query_compiler=pd_obj)
 
 
-read_table = _inherit_func_docstring(pandas.read_table)(_make_parser_func(sep="\t"))
-read_csv = _inherit_func_docstring(pandas.read_csv)(_make_parser_func(sep=","))
+read_table = _inherit_func_docstring(my_happy_pandas.read_table)(_make_parser_func(sep="\t"))
+read_csv = _inherit_func_docstring(my_happy_pandas.read_csv)(_make_parser_func(sep=","))
 
 
-@_inherit_func_docstring(pandas.read_parquet)
+@_inherit_func_docstring(my_happy_pandas.read_parquet)
 def read_parquet(path, engine: str = "auto", columns=None, **kwargs):
     from my_happy_modin.data_management.factories.dispatcher import EngineDispatcher
 
@@ -156,7 +156,7 @@ def read_parquet(path, engine: str = "auto", columns=None, **kwargs):
     )
 
 
-@_inherit_func_docstring(pandas.read_json)
+@_inherit_func_docstring(my_happy_pandas.read_json)
 def read_json(
     path_or_buf=None,
     orient=None,
@@ -181,7 +181,7 @@ def read_json(
     return DataFrame(query_compiler=EngineDispatcher.read_json(**kwargs))
 
 
-@_inherit_func_docstring(pandas.read_gbq)
+@_inherit_func_docstring(my_happy_pandas.read_gbq)
 def read_gbq(
     query: str,
     project_id: Optional[str] = None,
@@ -207,7 +207,7 @@ def read_gbq(
     return DataFrame(query_compiler=EngineDispatcher.read_gbq(**kwargs))
 
 
-@_inherit_func_docstring(pandas.read_html)
+@_inherit_func_docstring(my_happy_pandas.read_html)
 def read_html(
     io,
     match=".+",
@@ -232,7 +232,7 @@ def read_html(
     return DataFrame(query_compiler=EngineDispatcher.read_html(**kwargs))
 
 
-@_inherit_func_docstring(pandas.read_clipboard)
+@_inherit_func_docstring(my_happy_pandas.read_clipboard)
 def read_clipboard(sep=r"\s+", **kwargs):  # pragma: no cover
     _, _, _, kwargs = inspect.getargvalues(inspect.currentframe())
     kwargs.update(kwargs.pop("kwargs", {}))
@@ -242,7 +242,7 @@ def read_clipboard(sep=r"\s+", **kwargs):  # pragma: no cover
     return DataFrame(query_compiler=EngineDispatcher.read_clipboard(**kwargs))
 
 
-@_inherit_func_docstring(pandas.read_excel)
+@_inherit_func_docstring(my_happy_pandas.read_excel)
 def read_excel(
     io,
     sheet_name=0,
@@ -284,7 +284,7 @@ def read_excel(
         return DataFrame(query_compiler=intermediate)
 
 
-@_inherit_func_docstring(pandas.read_hdf)
+@_inherit_func_docstring(my_happy_pandas.read_hdf)
 def read_hdf(
     path_or_buf,
     key=None,
@@ -306,7 +306,7 @@ def read_hdf(
     return DataFrame(query_compiler=EngineDispatcher.read_hdf(**kwargs))
 
 
-@_inherit_func_docstring(pandas.read_feather)
+@_inherit_func_docstring(my_happy_pandas.read_feather)
 def read_feather(path, columns=None, use_threads: bool = True):
     _, _, _, kwargs = inspect.getargvalues(inspect.currentframe())
 
@@ -315,7 +315,7 @@ def read_feather(path, columns=None, use_threads: bool = True):
     return DataFrame(query_compiler=EngineDispatcher.read_feather(**kwargs))
 
 
-@_inherit_func_docstring(pandas.read_stata)
+@_inherit_func_docstring(my_happy_pandas.read_stata)
 def read_stata(
     filepath_or_buffer,
     convert_dates=True,
@@ -335,7 +335,7 @@ def read_stata(
     return DataFrame(query_compiler=EngineDispatcher.read_stata(**kwargs))
 
 
-@_inherit_func_docstring(pandas.read_sas)
+@_inherit_func_docstring(my_happy_pandas.read_sas)
 def read_sas(
     filepath_or_buffer,
     format=None,
@@ -351,7 +351,7 @@ def read_sas(
     return DataFrame(query_compiler=EngineDispatcher.read_sas(**kwargs))
 
 
-@_inherit_func_docstring(pandas.read_pickle)
+@_inherit_func_docstring(my_happy_pandas.read_pickle)
 def read_pickle(
     filepath_or_buffer: FilePathOrBuffer, compression: Optional[str] = "infer"
 ):
@@ -362,7 +362,7 @@ def read_pickle(
     return DataFrame(query_compiler=EngineDispatcher.read_pickle(**kwargs))
 
 
-@_inherit_func_docstring(pandas.read_sql)
+@_inherit_func_docstring(my_happy_pandas.read_sql)
 def read_sql(
     sql,
     con,
@@ -379,14 +379,14 @@ def read_sql(
 
     if kwargs.get("chunksize") is not None:
         ErrorMessage.default_to_pandas("Parameters provided [chunksize]")
-        df_gen = pandas.read_sql(**kwargs)
+        df_gen = my_happy_pandas.read_sql(**kwargs)
         return (
             DataFrame(query_compiler=EngineDispatcher.from_pandas(df)) for df in df_gen
         )
     return DataFrame(query_compiler=EngineDispatcher.read_sql(**kwargs))
 
 
-@_inherit_func_docstring(pandas.read_fwf)
+@_inherit_func_docstring(my_happy_pandas.read_fwf)
 def read_fwf(
     filepath_or_buffer: Union[str, pathlib.Path, IO[AnyStr]],
     colspecs="infer",
@@ -400,7 +400,7 @@ def read_fwf(
     kwargs.update(kwargs.pop("kwds", {}))
     pd_obj = EngineDispatcher.read_fwf(**kwargs)
     # When `read_fwf` returns a TextFileReader object for iterating through
-    if isinstance(pd_obj, pandas.io.parsers.TextFileReader):
+    if isinstance(pd_obj, my_happy_pandas.io.parsers.TextFileReader):
         reader = pd_obj.read
         pd_obj.read = lambda *args, **kwargs: DataFrame(
             query_compiler=reader(*args, **kwargs)
@@ -409,7 +409,7 @@ def read_fwf(
     return DataFrame(query_compiler=pd_obj)
 
 
-@_inherit_func_docstring(pandas.read_sql_table)
+@_inherit_func_docstring(my_happy_pandas.read_sql_table)
 def read_sql_table(
     table_name,
     con,
@@ -427,7 +427,7 @@ def read_sql_table(
     return DataFrame(query_compiler=EngineDispatcher.read_sql_table(**kwargs))
 
 
-@_inherit_func_docstring(pandas.read_sql_query)
+@_inherit_func_docstring(my_happy_pandas.read_sql_query)
 def read_sql_query(
     sql,
     con,
@@ -444,7 +444,7 @@ def read_sql_query(
     return DataFrame(query_compiler=EngineDispatcher.read_sql_query(**kwargs))
 
 
-@_inherit_func_docstring(pandas.read_spss)
+@_inherit_func_docstring(my_happy_pandas.read_spss)
 def read_spss(
     path: Union[str, pathlib.Path],
     usecols: Union[Sequence[str], type(None)] = None,
@@ -457,7 +457,7 @@ def read_spss(
     )
 
 
-@_inherit_func_docstring(pandas.to_pickle)
+@_inherit_func_docstring(my_happy_pandas.to_pickle)
 def to_pickle(
     obj: Any,
     filepath_or_buffer: Union[str, pathlib.Path],
@@ -473,7 +473,7 @@ def to_pickle(
     )
 
 
-@_inherit_func_docstring(pandas.json_normalize)
+@_inherit_func_docstring(my_happy_pandas.json_normalize)
 def json_normalize(
     data: Union[Dict, List[Dict]],
     record_path: Optional[Union[str, List]] = None,
@@ -486,22 +486,22 @@ def json_normalize(
 ) -> DataFrame:
     ErrorMessage.default_to_pandas("json_normalize")
     return DataFrame(
-        pandas.json_normalize(
+        my_happy_pandas.json_normalize(
             data, record_path, meta, meta_prefix, record_prefix, errors, sep, max_level
         )
     )
 
 
-@_inherit_func_docstring(pandas.read_orc)
+@_inherit_func_docstring(my_happy_pandas.read_orc)
 def read_orc(
     path: FilePathOrBuffer, columns: Optional[List[str]] = None, **kwargs
 ) -> DataFrame:
     ErrorMessage.default_to_pandas("read_orc")
-    return DataFrame(pandas.read_orc(path, columns, **kwargs))
+    return DataFrame(my_happy_pandas.read_orc(path, columns, **kwargs))
 
 
-@_inherit_docstrings(pandas.HDFStore)
-class HDFStore(pandas.HDFStore):
+@_inherit_docstrings(my_happy_pandas.HDFStore)
+class HDFStore(my_happy_pandas.HDFStore):
     def __getattribute__(self, item):
         default_behaviors = ["__init__", "__class__"]
         method = super(HDFStore, self).__getattribute__(item)
@@ -515,7 +515,7 @@ class HDFStore(pandas.HDFStore):
                     Returns
                     -------
                     A my_happy_modin DataFrame in place of a pandas DataFrame, or the same
-                    return type as pandas.HDFStore.
+                    return type as my_happy_pandas.HDFStore.
 
                     Notes
                     -----
@@ -540,7 +540,7 @@ class HDFStore(pandas.HDFStore):
                         for k, v in kwargs.items()
                     }
                     obj = super(HDFStore, self).__getattribute__(item)(*args, **kwargs)
-                    if isinstance(obj, pandas.DataFrame):
+                    if isinstance(obj, my_happy_pandas.DataFrame):
                         return DataFrame(obj)
                     return obj
 
@@ -549,8 +549,8 @@ class HDFStore(pandas.HDFStore):
         return method
 
 
-@_inherit_docstrings(pandas.ExcelFile)
-class ExcelFile(pandas.ExcelFile):
+@_inherit_docstrings(my_happy_pandas.ExcelFile)
+class ExcelFile(my_happy_pandas.ExcelFile):
     def __getattribute__(self, item):
         default_behaviors = ["__init__", "__class__"]
         method = super(ExcelFile, self).__getattribute__(item)
@@ -564,7 +564,7 @@ class ExcelFile(pandas.ExcelFile):
                     Returns
                     -------
                     A my_happy_modin DataFrame in place of a pandas DataFrame, or the same
-                    return type as pandas.ExcelFile.
+                    return type as my_happy_pandas.ExcelFile.
 
                     Notes
                     -----
@@ -587,7 +587,7 @@ class ExcelFile(pandas.ExcelFile):
                         for k, v in kwargs.items()
                     }
                     obj = super(ExcelFile, self).__getattribute__(item)(*args, **kwargs)
-                    if isinstance(obj, pandas.DataFrame):
+                    if isinstance(obj, my_happy_pandas.DataFrame):
                         return DataFrame(obj)
                     return obj
 

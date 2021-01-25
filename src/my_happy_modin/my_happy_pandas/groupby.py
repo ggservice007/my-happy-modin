@@ -23,11 +23,11 @@ Manually add documentation for methods which are not presented in pandas.
 """
 
 import numpy as np
-import pandas
-import pandas.core.groupby
-from pandas.core.dtypes.common import is_list_like
-from pandas.core.aggregation import reconstruct_func
-import pandas.core.common as com
+import my_happy_pandas
+import my_happy_pandas.core.groupby
+from my_happy_pandas.core.dtypes.common import is_list_like
+from my_happy_pandas.core.aggregation import reconstruct_func
+import my_happy_pandas.core.common as com
 from types import BuiltinFunctionType
 from collections.abc import Iterable
 
@@ -44,9 +44,9 @@ from .series import Series
 
 
 @_inherit_docstrings(
-    pandas.core.groupby.DataFrameGroupBy,
+    my_happy_pandas.core.groupby.DataFrameGroupBy,
     excluded=[
-        pandas.core.groupby.DataFrameGroupBy.__init__,
+        my_happy_pandas.core.groupby.DataFrameGroupBy.__init__,
     ],
 )
 class DataFrameGroupBy(object):
@@ -193,7 +193,7 @@ class DataFrameGroupBy(object):
                 and (
                     # Check using `issubset` is effective only in case of MultiIndex
                     set(self._by.columns).issubset(list(self._df.columns))
-                    if isinstance(self._by.columns, pandas.MultiIndex)
+                    if isinstance(self._by.columns, my_happy_pandas.MultiIndex)
                     else len(
                         self._by.columns.unique()
                         .sort_values()
@@ -228,7 +228,7 @@ class DataFrameGroupBy(object):
             new_idx_lvl_arrays = np.concatenate(
                 [self._df[self._by.columns].values.T, [list(result.index)]]
             )
-            result.index = pandas.MultiIndex.from_arrays(
+            result.index = my_happy_pandas.MultiIndex.from_arrays(
                 new_idx_lvl_arrays,
                 names=[col_name for col_name in self._by.columns]
                 + [result._query_compiler.get_index_name()],
@@ -393,7 +393,7 @@ class DataFrameGroupBy(object):
             func_dict = {col: try_get_str_func(fn) for col, fn in func_dict.items()}
 
             if any(i not in self._df.columns for i in func_dict.keys()):
-                from pandas.core.base import SpecificationError
+                from my_happy_pandas.core.base import SpecificationError
 
                 raise SpecificationError("nested renamer is not supported")
             if func is None:
@@ -429,7 +429,7 @@ class DataFrameGroupBy(object):
                 nby_cols = len(result.columns) - len(new_columns)
                 order = np.concatenate([np.arange(nby_cols), order + nby_cols])
                 by_cols = result.columns[:nby_cols]
-                new_columns = pandas.Index(new_columns)
+                new_columns = my_happy_pandas.Index(new_columns)
                 if by_cols.nlevels != new_columns.nlevels:
                     by_cols = by_cols.remove_unused_levels()
                     empty_levels = [
@@ -982,9 +982,9 @@ class DataFrameGroupBy(object):
 
 
 @_inherit_docstrings(
-    pandas.core.groupby.SeriesGroupBy,
+    my_happy_pandas.core.groupby.SeriesGroupBy,
     excluded=[
-        pandas.core.groupby.SeriesGroupBy.__init__,
+        my_happy_pandas.core.groupby.SeriesGroupBy.__init__,
     ],
 )
 class SeriesGroupBy(DataFrameGroupBy):

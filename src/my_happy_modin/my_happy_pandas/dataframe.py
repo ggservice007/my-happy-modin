@@ -22,19 +22,19 @@ for better maintability. So some codes are ignored in pydocstyle check:
 Manually add documentation for methods which are not presented in pandas.
 """
 
-import pandas
-from pandas.core.common import apply_if_callable
-from pandas.core.dtypes.common import (
+import my_happy_pandas
+from my_happy_pandas.core.common import apply_if_callable
+from my_happy_pandas.core.dtypes.common import (
     infer_dtype_from_object,
     is_dict_like,
     is_list_like,
     is_numeric_dtype,
 )
-from pandas.core.indexes.api import ensure_index_from_sequences
-from pandas.util._validators import validate_bool_kwarg
-from pandas.io.formats.printing import pprint_thing
-from pandas._libs.lib import no_default
-from pandas._typing import Label
+from my_happy_pandas.core.indexes.api import ensure_index_from_sequences
+from my_happy_pandas.util._validators import validate_bool_kwarg
+from my_happy_pandas.io.formats.printing import pprint_thing
+from my_happy_pandas._libs.lib import no_default
+from my_happy_pandas._typing import Label
 
 import itertools
 import functools
@@ -57,7 +57,7 @@ from .groupby import DataFrameGroupBy
 from .accessor import CachedAccessor, SparseFrameAccessor
 
 
-@_inherit_docstrings(pandas.DataFrame, excluded=[pandas.DataFrame.__init__])
+@_inherit_docstrings(my_happy_pandas.DataFrame, excluded=[my_happy_pandas.DataFrame.__init__])
 class DataFrame(BasePandasDataset):
     def __init__(
         self,
@@ -76,9 +76,9 @@ class DataFrame(BasePandasDataset):
         data: NumPy ndarray (structured or homogeneous) or dict:
             Dict can contain Series, arrays, constants, or list-like
             objects.
-        index: pandas.Index, list, ObjectID
+        index: my_happy_pandas.Index, list, ObjectID
             The row index for this DataFrame.
-        columns: pandas.Index
+        columns: my_happy_pandas.Index
             The column names for this DataFrame, in pandas Index object.
         dtype: Data type to force.
             Only a single dtype is allowed. If None, infer
@@ -143,13 +143,13 @@ class DataFrame(BasePandasDataset):
                     except TypeError:
                         data = values
             elif is_dict_like(data) and not isinstance(
-                data, (pandas.Series, Series, pandas.DataFrame, DataFrame)
+                data, (my_happy_pandas.Series, Series, my_happy_pandas.DataFrame, DataFrame)
             ):
                 data = {
                     k: v._to_pandas() if isinstance(v, Series) else v
                     for k, v in data.items()
                 }
-            pandas_df = pandas.DataFrame(
+            pandas_df = my_happy_pandas.DataFrame(
                 data=data, index=index, columns=columns, dtype=dtype, copy=copy
             )
             self._query_compiler = from_pandas(pandas_df)._query_compiler
@@ -157,11 +157,11 @@ class DataFrame(BasePandasDataset):
             self._query_compiler = query_compiler
 
     def __repr__(self):
-        from pandas.io.formats import console
+        from my_happy_pandas.io.formats import console
 
-        num_rows = pandas.get_option("display.max_rows") or 10
-        num_cols = pandas.get_option("display.max_columns") or 20
-        if pandas.get_option("display.max_columns") is None and pandas.get_option(
+        num_rows = my_happy_pandas.get_option("display.max_rows") or 10
+        num_cols = my_happy_pandas.get_option("display.max_columns") or 20
+        if my_happy_pandas.get_option("display.max_columns") is None and my_happy_pandas.get_option(
             "display.expand_frame_repr"
         ):
             width, _ = console.get_console_size()
@@ -190,8 +190,8 @@ class DataFrame(BasePandasDataset):
             return result
 
     def _repr_html_(self):  # pragma: no cover
-        num_rows = pandas.get_option("max_rows") or 60
-        num_cols = pandas.get_option("max_columns") or 20
+        num_rows = my_happy_pandas.get_option("max_rows") or 60
+        num_cols = my_happy_pandas.get_option("max_columns") or 20
 
         # We use pandas _repr_html_ to get a string of the HTML representation
         # of the dataframe.
@@ -357,7 +357,7 @@ class DataFrame(BasePandasDataset):
         drop = False
 
         if (
-            not isinstance(by, (pandas.Series, Series))
+            not isinstance(by, (my_happy_pandas.Series, Series))
             and is_list_like(by)
             and len(by) == 1
         ):
@@ -365,7 +365,7 @@ class DataFrame(BasePandasDataset):
 
         if callable(by):
             by = self.index.map(by)
-        elif hashable(by) and not isinstance(by, pandas.Grouper):
+        elif hashable(by) and not isinstance(by, my_happy_pandas.Grouper):
             drop = by in self.columns
             idx_name = by
             if self._query_compiler.has_multiindex(
@@ -482,13 +482,13 @@ class DataFrame(BasePandasDataset):
                 # We must transpose here because a Series becomes a new row, and the
                 # structure of the query compiler is currently columnar
                 other = other._query_compiler.transpose()
-                other.index = pandas.Index([name], name=self.index.name)
+                other.index = my_happy_pandas.Index([name], name=self.index.name)
             else:
                 # See note above about transpose
                 other = other._query_compiler.transpose()
         elif isinstance(other, list):
             if not all(isinstance(o, BasePandasDataset) for o in other):
-                other = DataFrame(pandas.DataFrame(other))._query_compiler
+                other = DataFrame(my_happy_pandas.DataFrame(other))._query_compiler
             else:
                 other = [obj._query_compiler for obj in other]
         else:
@@ -565,7 +565,7 @@ class DataFrame(BasePandasDataset):
         keep_equal: bool = False,
     ) -> "DataFrame":
         return self._default_to_pandas(
-            pandas.DataFrame.compare,
+            my_happy_pandas.DataFrame.compare,
             other=other,
             align_axis=align_axis,
             keep_shape=keep_shape,
@@ -584,7 +584,7 @@ class DataFrame(BasePandasDataset):
         if isinstance(other, DataFrame):
             other = other._query_compiler.to_pandas()
         return self._default_to_pandas(
-            pandas.DataFrame.corrwith, other, axis=axis, drop=drop, method=method
+            my_happy_pandas.DataFrame.corrwith, other, axis=axis, drop=drop, method=method
         )
 
     def cov(self, min_periods=None, ddof: Optional[int] = 1):
@@ -663,7 +663,7 @@ class DataFrame(BasePandasDataset):
         )
 
     def equals(self, other):
-        if isinstance(other, pandas.DataFrame):
+        if isinstance(other, my_happy_pandas.DataFrame):
             # Copy into a my_happy_modin DataFrame to simplify logic below
             other = DataFrame(other)
         return (
@@ -674,7 +674,7 @@ class DataFrame(BasePandasDataset):
 
     def explode(self, column: Union[str, Tuple], ignore_index: bool = False):
         return self._default_to_pandas(
-            pandas.DataFrame.explode, column, ignore_index=ignore_index
+            my_happy_pandas.DataFrame.explode, column, ignore_index=ignore_index
         )
 
     def eval(self, expr, inplace=False, **kwargs):
@@ -682,7 +682,7 @@ class DataFrame(BasePandasDataset):
         inplace = validate_bool_kwarg(inplace, "inplace")
         new_query_compiler = self._query_compiler.eval(expr, **kwargs)
         return_type = type(
-            pandas.DataFrame(columns=self.columns)
+            my_happy_pandas.DataFrame(columns=self.columns)
             .astype(self.dtypes)
             .eval(expr, **kwargs)
         ).__name__
@@ -711,7 +711,7 @@ class DataFrame(BasePandasDataset):
     ):  # pragma: no cover
         ErrorMessage.default_to_pandas("`from_dict`")
         return from_pandas(
-            pandas.DataFrame.from_dict(
+            my_happy_pandas.DataFrame.from_dict(
                 data, orient=orient, dtype=dtype, columns=columns
             )
         )
@@ -728,7 +728,7 @@ class DataFrame(BasePandasDataset):
     ):  # pragma: no cover
         ErrorMessage.default_to_pandas("`from_records`")
         return from_pandas(
-            pandas.DataFrame.from_records(
+            my_happy_pandas.DataFrame.from_records(
                 data,
                 index=index,
                 exclude=exclude,
@@ -766,7 +766,7 @@ class DataFrame(BasePandasDataset):
         **kwds,
     ):  # pragma: no cover
         return self._default_to_pandas(
-            pandas.DataFrame.hist,
+            my_happy_pandas.DataFrame.hist,
             column=column,
             by=by,
             grid=grid,
@@ -914,7 +914,7 @@ class DataFrame(BasePandasDataset):
         buf.write("\n".join(output))
 
     def insert(self, loc, column, value, allow_duplicates=False):
-        if isinstance(value, (DataFrame, pandas.DataFrame)):
+        if isinstance(value, (DataFrame, my_happy_pandas.DataFrame)):
             if len(value.columns) != 1:
                 raise ValueError("Wrong number of items passed 2, placement implies 1")
             value = value.squeeze(axis=1)
@@ -922,7 +922,7 @@ class DataFrame(BasePandasDataset):
         if not self._query_compiler.lazy_execution and len(self.index) == 0:
             if not hasattr(value, "index"):
                 try:
-                    value = pandas.Series(value)
+                    value = my_happy_pandas.Series(value)
                 except (TypeError, ValueError, IndexError):
                     raise ValueError(
                         "Cannot insert into a DataFrame with no defined index "
@@ -941,7 +941,7 @@ class DataFrame(BasePandasDataset):
         else:
             if (
                 is_list_like(value)
-                and not isinstance(value, (pandas.Series, Series))
+                and not isinstance(value, (my_happy_pandas.Series, Series))
                 and len(value) != len(self.index)
             ):
                 raise ValueError("Length of values does not match length of index")
@@ -973,7 +973,7 @@ class DataFrame(BasePandasDataset):
         **kwargs,
     ):
         return self._default_to_pandas(
-            pandas.DataFrame.interpolate,
+            my_happy_pandas.DataFrame.interpolate,
             method=method,
             axis=axis,
             limit=limit,
@@ -1032,9 +1032,9 @@ class DataFrame(BasePandasDataset):
             # fast. It gives us proper error checking for the edge cases that
             # would otherwise require a lot more logic.
             new_columns = (
-                pandas.DataFrame(columns=self.columns)
+                my_happy_pandas.DataFrame(columns=self.columns)
                 .join(
-                    pandas.DataFrame(columns=other.columns),
+                    my_happy_pandas.DataFrame(columns=other.columns),
                     lsuffix=lsuffix,
                     rsuffix=rsuffix,
                 )
@@ -1048,9 +1048,9 @@ class DataFrame(BasePandasDataset):
                     "Joining multiple DataFrames only supported for joining on index"
                 )
             new_columns = (
-                pandas.DataFrame(columns=self.columns)
+                my_happy_pandas.DataFrame(columns=self.columns)
                 .join(
-                    [pandas.DataFrame(columns=obj.columns) for obj in other],
+                    [my_happy_pandas.DataFrame(columns=obj.columns) for obj in other],
                     lsuffix=lsuffix,
                     rsuffix=rsuffix,
                 )
@@ -1070,7 +1070,7 @@ class DataFrame(BasePandasDataset):
         )
 
     def lookup(self, row_labels, col_labels):
-        return self._default_to_pandas(pandas.DataFrame.lookup, row_labels, col_labels)
+        return self._default_to_pandas(my_happy_pandas.DataFrame.lookup, row_labels, col_labels)
 
     def lt(self, other, axis="columns", level=None):
         return self._binary_op(
@@ -1222,8 +1222,8 @@ class DataFrame(BasePandasDataset):
                 return new_df
 
     def unstack(self, level=-1, fill_value=None):
-        if not isinstance(self.index, pandas.MultiIndex) or (
-            isinstance(self.index, pandas.MultiIndex)
+        if not isinstance(self.index, my_happy_pandas.MultiIndex) or (
+            isinstance(self.index, my_happy_pandas.MultiIndex)
             and is_list_like(level)
             and len(level) == self.index.nlevels
         ):
@@ -1409,12 +1409,12 @@ class DataFrame(BasePandasDataset):
         if axis is not None:
             axis = self._get_axis_number(axis)
         if index is not None or (mapper is not None and axis == 0):
-            new_index = pandas.DataFrame(index=self.index).rename(**kwargs).index
+            new_index = my_happy_pandas.DataFrame(index=self.index).rename(**kwargs).index
         else:
             new_index = None
         if columns is not None or (mapper is not None and axis == 1):
             new_columns = (
-                pandas.DataFrame(columns=self.columns).rename(**kwargs).columns
+                my_happy_pandas.DataFrame(columns=self.columns).rename(**kwargs).columns
             )
         else:
             new_columns = None
@@ -1510,7 +1510,7 @@ class DataFrame(BasePandasDataset):
     def select_dtypes(self, include=None, exclude=None):
         # Validates arguments for whether both include and exclude are None or
         # if they are disjoint. Also invalidates string dtypes.
-        pandas.DataFrame().select_dtypes(include, exclude)
+        my_happy_pandas.DataFrame().select_dtypes(include, exclude)
 
         if include and not is_list_like(include):
             include = [include]
@@ -1523,8 +1523,8 @@ class DataFrame(BasePandasDataset):
 
         sel = tuple(map(set, (include, exclude)))
         include, exclude = map(lambda x: set(map(infer_dtype_from_object, x)), sel)
-        include_these = pandas.Series(not bool(include), index=self.columns)
-        exclude_these = pandas.Series(not bool(exclude), index=self.columns)
+        include_these = my_happy_pandas.Series(not bool(include), index=self.columns)
+        exclude_these = my_happy_pandas.Series(not bool(exclude), index=self.columns)
 
         def is_dtype_instance_mapper(column, dtype):
             return column, functools.partial(issubclass, dtype.type)
@@ -1565,7 +1565,7 @@ class DataFrame(BasePandasDataset):
                 arrays.append(self.index)
         to_remove = []
         for col in keys:
-            if isinstance(col, pandas.MultiIndex):
+            if isinstance(col, my_happy_pandas.MultiIndex):
                 # append all but the last column so we don't have to modify
                 # the end of this loop
                 for n in range(col.nlevels - 1):
@@ -1573,13 +1573,13 @@ class DataFrame(BasePandasDataset):
 
                 level = col._get_level_values(col.nlevels - 1)
                 names.extend(col.names)
-            elif isinstance(col, pandas.Series):
+            elif isinstance(col, my_happy_pandas.Series):
                 level = col._values
                 names.append(col.name)
-            elif isinstance(col, pandas.Index):
+            elif isinstance(col, my_happy_pandas.Index):
                 level = col
                 names.append(col.name)
-            elif isinstance(col, (list, np.ndarray, pandas.Index)):
+            elif isinstance(col, (list, np.ndarray, my_happy_pandas.Index)):
                 level = col
                 names.append(None)
             else:
@@ -1617,8 +1617,8 @@ class DataFrame(BasePandasDataset):
             return self.copy()
 
     def stack(self, level=-1, dropna=True):
-        if not isinstance(self.columns, pandas.MultiIndex) or (
-            isinstance(self.columns, pandas.MultiIndex)
+        if not isinstance(self.columns, my_happy_pandas.MultiIndex) or (
+            isinstance(self.columns, my_happy_pandas.MultiIndex)
             and is_list_like(level)
             and len(level) == self.columns.nlevels
         ):
@@ -1698,7 +1698,7 @@ class DataFrame(BasePandasDataset):
         )
 
     def to_feather(self, path, **kwargs):  # pragma: no cover
-        return self._default_to_pandas(pandas.DataFrame.to_feather, path, **kwargs)
+        return self._default_to_pandas(my_happy_pandas.DataFrame.to_feather, path, **kwargs)
 
     def to_gbq(
         self,
@@ -1714,7 +1714,7 @@ class DataFrame(BasePandasDataset):
         credentials=None,
     ):  # pragma: no cover
         return self._default_to_pandas(
-            pandas.DataFrame.to_gbq,
+            my_happy_pandas.DataFrame.to_gbq,
             destination_table,
             project_id=project_id,
             chunksize=chunksize,
@@ -1754,7 +1754,7 @@ class DataFrame(BasePandasDataset):
         encoding=None,
     ):
         return self._default_to_pandas(
-            pandas.DataFrame.to_html,
+            my_happy_pandas.DataFrame.to_html,
             buf=buf,
             columns=columns,
             col_space=col_space,
@@ -1790,7 +1790,7 @@ class DataFrame(BasePandasDataset):
         **kwargs,
     ):  # pragma: no cover
         return self._default_to_pandas(
-            pandas.DataFrame.to_parquet,
+            my_happy_pandas.DataFrame.to_parquet,
             path,
             engine=engine,
             compression=compression,
@@ -1804,7 +1804,7 @@ class DataFrame(BasePandasDataset):
 
     def to_records(self, index=True, column_dtypes=None, index_dtypes=None):
         return self._default_to_pandas(
-            pandas.DataFrame.to_records,
+            my_happy_pandas.DataFrame.to_records,
             index=index,
             column_dtypes=column_dtypes,
             index_dtypes=index_dtypes,
@@ -1824,7 +1824,7 @@ class DataFrame(BasePandasDataset):
         compression: Union[str, Mapping[str, str], None] = "infer",
     ):  # pragma: no cover
         return self._default_to_pandas(
-            pandas.DataFrame.to_stata,
+            my_happy_pandas.DataFrame.to_stata,
             path,
             convert_dates=convert_dates,
             write_index=write_index,
@@ -1894,7 +1894,7 @@ class DataFrame(BasePandasDataset):
         try_cast=False,
     ):
         inplace = validate_bool_kwarg(inplace, "inplace")
-        if isinstance(other, pandas.Series) and axis is None:
+        if isinstance(other, my_happy_pandas.Series) and axis is None:
             raise ValueError("Must specify axis=0 or 1")
         if level is not None:
             if isinstance(other, DataFrame):
@@ -1902,7 +1902,7 @@ class DataFrame(BasePandasDataset):
             if isinstance(cond, DataFrame):
                 cond = cond._query_compiler.to_pandas()
             new_query_compiler = self._default_to_pandas(
-                pandas.DataFrame.where,
+                my_happy_pandas.DataFrame.where,
                 cond,
                 other=other,
                 inplace=False,
@@ -1923,11 +1923,11 @@ class DataFrame(BasePandasDataset):
             cond = DataFrame(cond, index=self.index, columns=self.columns)
         if isinstance(other, DataFrame):
             other = other._query_compiler
-        elif isinstance(other, pandas.Series):
+        elif isinstance(other, my_happy_pandas.Series):
             other = other.reindex(self.index if not axis else self.columns)
         else:
             index = self.index if not axis else self.columns
-            other = pandas.Series(other, index=index)
+            other = my_happy_pandas.Series(other, index=index)
         query_compiler = self._query_compiler.where(
             cond._query_compiler, other, axis=axis, level=level
         )
@@ -1935,7 +1935,7 @@ class DataFrame(BasePandasDataset):
 
     def xs(self, key, axis=0, level=None, drop_level=True):
         return self._default_to_pandas(
-            pandas.DataFrame.xs, key, axis=axis, level=level, drop_level=drop_level
+            my_happy_pandas.DataFrame.xs, key, axis=axis, level=level, drop_level=drop_level
         )
 
     def _getitem_column(self, key):
@@ -1964,10 +1964,10 @@ class DataFrame(BasePandasDataset):
             pass
         elif key in self and key not in dir(self):
             self.__setitem__(key, value)
-        elif isinstance(value, pandas.Series):
+        elif isinstance(value, my_happy_pandas.Series):
             warnings.warn(
                 "my_happy_modin doesn't allow columns to be created via a new attribute name - see "
-                "https://pandas.pydata.org/pandas-docs/stable/indexing.html#attribute-access",
+                "https://my_happy_pandas.pydata.org/pandas-docs/stable/indexing.html#attribute-access",
                 UserWarning,
             )
         object.__setattr__(self, key, value)
@@ -1980,10 +1980,10 @@ class DataFrame(BasePandasDataset):
                 # that column to `key`, otherwise the name could be incorrect. Drop the
                 # last column name from the list (the appended value's name and append
                 # the new name.
-                self.columns = self.columns[:-1].append(pandas.Index([key]))
+                self.columns = self.columns[:-1].append(my_happy_pandas.Index([key]))
                 return
             elif (
-                isinstance(value, (pandas.DataFrame, DataFrame)) and value.shape[1] != 1
+                isinstance(value, (my_happy_pandas.DataFrame, DataFrame)) and value.shape[1] != 1
             ):
                 raise ValueError(
                     "Wrong number of items passed %i, placement implies 1"
@@ -2023,7 +2023,7 @@ class DataFrame(BasePandasDataset):
                 self._default_to_pandas(setitem_without_string_columns)._query_compiler
             )
         if is_list_like(value):
-            if isinstance(value, (pandas.DataFrame, DataFrame)):
+            if isinstance(value, (my_happy_pandas.DataFrame, DataFrame)):
                 value = value[value.columns[0]].values
             elif isinstance(value, np.ndarray):
                 assert (
@@ -2044,7 +2044,7 @@ class DataFrame(BasePandasDataset):
             self._update_inplace(self._query_compiler.setitem(0, key, value))
 
     def __hash__(self):
-        return self._default_to_pandas(pandas.DataFrame.__hash__)
+        return self._default_to_pandas(my_happy_pandas.DataFrame.__hash__)
 
     def __iter__(self):
         return iter(self.columns)
@@ -2053,10 +2053,10 @@ class DataFrame(BasePandasDataset):
         return self.columns.__contains__(key)
 
     def __round__(self, decimals=0):
-        return self._default_to_pandas(pandas.DataFrame.__round__, decimals=decimals)
+        return self._default_to_pandas(my_happy_pandas.DataFrame.__round__, decimals=decimals)
 
     def __setstate__(self, state):
-        return self._default_to_pandas(pandas.DataFrame.__setstate__, state)
+        return self._default_to_pandas(my_happy_pandas.DataFrame.__setstate__, state)
 
     def __delitem__(self, key):
         if key not in self:
@@ -2360,12 +2360,12 @@ class DataFrame(BasePandasDataset):
             return DataFrame(
                 query_compiler=self._query_compiler.getitem_array(key._query_compiler)
             )
-        elif isinstance(key, (np.ndarray, pandas.Index, list)):
+        elif isinstance(key, (np.ndarray, my_happy_pandas.Index, list)):
             return DataFrame(query_compiler=self._query_compiler.getitem_array(key))
         elif isinstance(key, DataFrame):
             return self.where(key)
         elif is_mi_columns:
-            return self._default_to_pandas(pandas.DataFrame.__getitem__, key)
+            return self._default_to_pandas(my_happy_pandas.DataFrame.__getitem__, key)
             # return self._getitem_multilevel(key)
         else:
             return self._getitem_column(key)

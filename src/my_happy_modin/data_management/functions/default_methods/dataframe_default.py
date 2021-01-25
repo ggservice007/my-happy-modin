@@ -13,12 +13,12 @@
 
 from .default import DefaultMethod
 
-import pandas
+import my_happy_pandas
 
 
 class DataFrameDefault(DefaultMethod):
     @classmethod
     def register(cls, func, obj_type=None, **kwargs):
         if obj_type is None:
-            obj_type = pandas.DataFrame
+            obj_type = my_happy_pandas.DataFrame
         return cls.call(func, obj_type=obj_type, **kwargs)

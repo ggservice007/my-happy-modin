@@ -48,7 +48,7 @@ class ParquetDispatcher(ColumnStoreDispatcher):
         https://arrow.apache.org/docs/python/parquet.html
         """
         from pyarrow.parquet import ParquetFile, ParquetDataset
-        from my_happy_modin.pandas.io import PQ_INDEX_REGEX
+        from my_happy_modin.my_happy_pandas.io import PQ_INDEX_REGEX
 
         if isinstance(path, str) and os.path.isdir(path):
             partitioned_columns = set()

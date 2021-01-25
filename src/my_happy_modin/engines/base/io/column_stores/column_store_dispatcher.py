@@ -12,7 +12,7 @@
 # governing permissions and limitations under the License.
 
 import numpy as np
-import pandas
+import my_happy_pandas
 
 from my_happy_modin.data_management.utils import compute_chunksize
 from my_happy_modin.engines.base.io.file_dispatcher import FileDispatcher
@@ -21,7 +21,7 @@ from my_happy_modin.engines.base.io.file_dispatcher import FileDispatcher
 class ColumnStoreDispatcher(FileDispatcher):
     @classmethod
     def call_deploy(cls, fname, col_partitions, **kwargs):
-        from my_happy_modin.pandas import DEFAULT_NPARTITIONS
+        from my_happy_modin.my_happy_pandas import DEFAULT_NPARTITIONS
 
         return np.array(
             [
@@ -57,16 +57,16 @@ class ColumnStoreDispatcher(FileDispatcher):
 
     @classmethod
     def build_index(cls, partition_ids):
-        from my_happy_modin.pandas import DEFAULT_NPARTITIONS
+        from my_happy_modin.my_happy_pandas import DEFAULT_NPARTITIONS
 
         index_len = cls.materialize(partition_ids[-2][0])
         if isinstance(index_len, int):
-            index = pandas.RangeIndex(index_len)
+            index = my_happy_pandas.RangeIndex(index_len)
         else:
             index = index_len
             index_len = len(index)
         index_chunksize = compute_chunksize(
-            pandas.DataFrame(index=index), DEFAULT_NPARTITIONS, axis=0
+            my_happy_pandas.DataFrame(index=index), DEFAULT_NPARTITIONS, axis=0
         )
         if index_chunksize > index_len:
             row_lengths = [index_len] + [0 for _ in range(DEFAULT_NPARTITIONS - 1)]
@@ -81,7 +81,7 @@ class ColumnStoreDispatcher(FileDispatcher):
 
     @classmethod
     def build_columns(cls, columns):
-        from my_happy_modin.pandas import DEFAULT_NPARTITIONS
+        from my_happy_modin.my_happy_pandas import DEFAULT_NPARTITIONS
 
         column_splits = (
             len(columns) // DEFAULT_NPARTITIONS
@@ -100,7 +100,7 @@ class ColumnStoreDispatcher(FileDispatcher):
         # Compute dtypes concatenating the results from each of the columns splits
         # determined above. This creates a pandas Series that contains a dtype for every
         # column.
-        dtypes = pandas.concat(cls.materialize(list(partition_ids)), axis=0)
+        dtypes = my_happy_pandas.concat(cls.materialize(list(partition_ids)), axis=0)
         dtypes.index = columns
         return dtypes
 

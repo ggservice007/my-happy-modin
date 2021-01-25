@@ -12,7 +12,7 @@
 # governing permissions and limitations under the License.
 
 from abc import ABC
-import pandas
+import my_happy_pandas
 import numpy as np
 from my_happy_modin.data_management.utils import split_result_of_axis_func_pandas
 
@@ -221,7 +221,7 @@ class PandasFrameAxisPartition(BaseFrameAxisPartition):
         manual_partition = kwargs.pop("manual_partition", False)
         lengths = kwargs.pop("_lengths", None)
 
-        dataframe = pandas.concat(list(partitions), axis=axis, copy=False)
+        dataframe = my_happy_pandas.concat(list(partitions), axis=axis, copy=False)
         result = func(dataframe, **kwargs)
 
         if manual_partition:
@@ -266,20 +266,20 @@ class PandasFrameAxisPartition(BaseFrameAxisPartition):
         -------
             A list of Pandas DataFrames.
         """
-        lt_frame = pandas.concat(partitions[:len_of_left], axis=axis, copy=False)
+        lt_frame = my_happy_pandas.concat(partitions[:len_of_left], axis=axis, copy=False)
 
         rt_parts = partitions[len_of_left:]
 
         # reshaping flattened `rt_parts` array into a frame with shape `other_shape`
         combined_axis = [
-            pandas.concat(
+            my_happy_pandas.concat(
                 rt_parts[other_shape[i - 1] : other_shape[i]],
                 axis=axis,
                 copy=False,
             )
             for i in range(1, len(other_shape))
         ]
-        rt_frame = pandas.concat(combined_axis, axis=axis ^ 1, copy=False)
+        rt_frame = my_happy_pandas.concat(combined_axis, axis=axis ^ 1, copy=False)
 
         result = func(lt_frame, rt_frame, **kwargs)
         return split_result_of_axis_func_pandas(axis, num_splits, result)

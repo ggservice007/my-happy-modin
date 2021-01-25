@@ -11,7 +11,7 @@
 # ANY KIND, either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-import pandas
+import my_happy_pandas
 from collections import OrderedDict
 from my_happy_modin.error_message import ErrorMessage
 from my_happy_modin.backends.base.query_compiler import BaseQueryCompiler
@@ -51,7 +51,7 @@ class BaseIO(object):
             https://arrow.apache.org/docs/python/parquet.html
         """
         ErrorMessage.default_to_pandas("`read_parquet`")
-        return cls.from_pandas(pandas.read_parquet(path, engine, columns, **kwargs))
+        return cls.from_pandas(my_happy_pandas.read_parquet(path, engine, columns, **kwargs))
 
     @classmethod
     def read_csv(
@@ -167,12 +167,12 @@ class BaseIO(object):
             filepath_or_buffer:
                   The filepath of the csv file.
                   We only support local files for now.
-            kwargs: Keyword arguments in pandas.read_csv
+            kwargs: Keyword arguments in my_happy_pandas.read_csv
         """
-        pd_obj = pandas.read_csv(**kwargs)
-        if isinstance(pd_obj, pandas.DataFrame):
+        pd_obj = my_happy_pandas.read_csv(**kwargs)
+        if isinstance(pd_obj, my_happy_pandas.DataFrame):
             return cls.from_pandas(pd_obj)
-        if isinstance(pd_obj, pandas.io.parsers.TextFileReader):
+        if isinstance(pd_obj, my_happy_pandas.io.parsers.TextFileReader):
             # Overwriting the read method should return a my_happy_modin DataFrame for calls
             # to __next__ and get_chunk
             pd_read = pd_obj.read
@@ -218,7 +218,7 @@ class BaseIO(object):
             "compression": compression,
             "nrows": nrows,
         }
-        return cls.from_pandas(pandas.read_json(**kwargs))
+        return cls.from_pandas(my_happy_pandas.read_json(**kwargs))
 
     @classmethod
     def read_gbq(
@@ -241,7 +241,7 @@ class BaseIO(object):
     ):
         ErrorMessage.default_to_pandas("`read_gbq`")
         return cls.from_pandas(
-            pandas.read_gbq(
+            my_happy_pandas.read_gbq(
                 query,
                 project_id=project_id,
                 index_col=index_col,
@@ -297,12 +297,12 @@ class BaseIO(object):
             "keep_default_na": keep_default_na,
             "displayed_only": displayed_only,
         }
-        return cls.from_pandas(pandas.read_html(**kwargs)[0])
+        return cls.from_pandas(my_happy_pandas.read_html(**kwargs)[0])
 
     @classmethod
     def read_clipboard(cls, sep=r"\s+", **kwargs):  # pragma: no cover
         ErrorMessage.default_to_pandas("`read_clipboard`")
-        return cls.from_pandas(pandas.read_clipboard(sep=sep, **kwargs))
+        return cls.from_pandas(my_happy_pandas.read_clipboard(sep=sep, **kwargs))
 
     @classmethod
     def read_excel(
@@ -338,7 +338,7 @@ class BaseIO(object):
         if skip_footer != 0:
             skipfooter = skip_footer
         ErrorMessage.default_to_pandas("`read_excel`")
-        intermediate = pandas.read_excel(
+        intermediate = my_happy_pandas.read_excel(
             io,
             sheet_name=sheet_name,
             header=header,
@@ -391,7 +391,7 @@ class BaseIO(object):
     ):
         ErrorMessage.default_to_pandas("`read_hdf`")
         return cls.from_pandas(
-            pandas.read_hdf(
+            my_happy_pandas.read_hdf(
                 path_or_buf,
                 key=key,
                 mode=mode,
@@ -410,7 +410,7 @@ class BaseIO(object):
     def read_feather(cls, path, columns=None, use_threads=True):
         ErrorMessage.default_to_pandas("`read_feather`")
         return cls.from_pandas(
-            pandas.read_feather(path, columns=columns, use_threads=use_threads)
+            my_happy_pandas.read_feather(path, columns=columns, use_threads=use_threads)
         )
 
     @classmethod
@@ -440,7 +440,7 @@ class BaseIO(object):
             "chunksize": chunksize,
             "iterator": iterator,
         }
-        return cls.from_pandas(pandas.read_stata(**kwargs))
+        return cls.from_pandas(my_happy_pandas.read_stata(**kwargs))
 
     @classmethod
     def read_sas(
@@ -454,7 +454,7 @@ class BaseIO(object):
     ):  # pragma: no cover
         ErrorMessage.default_to_pandas("`read_sas`")
         return cls.from_pandas(
-            pandas.read_sas(
+            my_happy_pandas.read_sas(
                 filepath_or_buffer,
                 format=format,
                 index=index,
@@ -468,7 +468,7 @@ class BaseIO(object):
     def read_pickle(cls, filepath_or_buffer, compression="infer"):
         ErrorMessage.default_to_pandas("`read_pickle`")
         return cls.from_pandas(
-            pandas.read_pickle(filepath_or_buffer, compression=compression)
+            my_happy_pandas.read_pickle(filepath_or_buffer, compression=compression)
         )
 
     @classmethod
@@ -485,7 +485,7 @@ class BaseIO(object):
     ):
         ErrorMessage.default_to_pandas("`read_sql`")
         return cls.from_pandas(
-            pandas.read_sql(
+            my_happy_pandas.read_sql(
                 sql,
                 con,
                 index_col=index_col,
@@ -502,16 +502,16 @@ class BaseIO(object):
         cls, filepath_or_buffer, colspecs="infer", widths=None, infer_nrows=100, **kwds
     ):
         ErrorMessage.default_to_pandas("`read_fwf`")
-        pd_obj = pandas.read_fwf(
+        pd_obj = my_happy_pandas.read_fwf(
             filepath_or_buffer,
             colspecs=colspecs,
             widths=widths,
             infer_nrows=infer_nrows,
             **kwds,
         )
-        if isinstance(pd_obj, pandas.DataFrame):
+        if isinstance(pd_obj, my_happy_pandas.DataFrame):
             return cls.from_pandas(pd_obj)
-        if isinstance(pd_obj, pandas.io.parsers.TextFileReader):
+        if isinstance(pd_obj, my_happy_pandas.io.parsers.TextFileReader):
             # Overwriting the read method should return a my_happy_modin DataFrame for calls
             # to __next__ and get_chunk
             pd_read = pd_obj.read
@@ -534,7 +534,7 @@ class BaseIO(object):
     ):
         ErrorMessage.default_to_pandas("`read_sql_table`")
         return cls.from_pandas(
-            pandas.read_sql_table(
+            my_happy_pandas.read_sql_table(
                 table_name,
                 con,
                 schema=schema,
@@ -559,7 +559,7 @@ class BaseIO(object):
     ):
         ErrorMessage.default_to_pandas("`read_sql_query`")
         return cls.from_pandas(
-            pandas.read_sql_query(
+            my_happy_pandas.read_sql_query(
                 sql,
                 con,
                 index_col=index_col,
@@ -573,7 +573,7 @@ class BaseIO(object):
     @classmethod
     def read_spss(cls, path, usecols, convert_categoricals):
         ErrorMessage.default_to_pandas("`read_spss`")
-        return cls.from_pandas(pandas.read_spss(path, usecols, convert_categoricals))
+        return cls.from_pandas(my_happy_pandas.read_spss(path, usecols, convert_categoricals))
 
     @classmethod
     def to_sql(
@@ -609,10 +609,10 @@ class BaseIO(object):
             protocol = -1
         ErrorMessage.default_to_pandas("`to_pickle`")
         if isinstance(obj, BaseQueryCompiler):
-            return pandas.to_pickle(
+            return my_happy_pandas.to_pickle(
                 obj.to_pandas(), path, compression=compression, protocol=protocol
             )
         else:
-            return pandas.to_pickle(
+            return my_happy_pandas.to_pickle(
                 obj, path, compression=compression, protocol=protocol
             )

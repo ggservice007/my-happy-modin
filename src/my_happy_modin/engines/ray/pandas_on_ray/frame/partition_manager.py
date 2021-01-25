@@ -20,7 +20,7 @@ from .axis_partition import (
 )
 from .partition import PandasOnRayFramePartition
 from my_happy_modin.error_message import ErrorMessage
-import pandas
+import my_happy_pandas
 
 import ray
 
@@ -102,7 +102,7 @@ class PandasOnRayFrameManager(RayFrameManager):
     @classmethod
     def broadcast_apply(cls, axis, apply_func, left, right, other_name="r"):
         def mapper(df, others):
-            other = pandas.concat(others, axis=axis ^ 1)
+            other = my_happy_pandas.concat(others, axis=axis ^ 1)
             return apply_func(df, **{other_name: other})
 
         mapper = ray.put(mapper)

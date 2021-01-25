@@ -11,7 +11,7 @@
 # ANY KIND, either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-import pandas
+import my_happy_pandas
 from my_happy_modin.config import Engine, Backend, IsExperimental
 
 
@@ -120,9 +120,9 @@ def try_cast_to_pandas(obj, squeeze=False):
         fn_name = getattr(obj, "__name__", None)
         if fn_name and module_hierarchy[0] == "my_happy_modin":
             return (
-                getattr(pandas.DataFrame, fn_name, obj)
+                getattr(my_happy_pandas.DataFrame, fn_name, obj)
                 if module_hierarchy[-1] == "dataframe"
-                else getattr(pandas.Series, fn_name, obj)
+                else getattr(my_happy_pandas.Series, fn_name, obj)
             )
     return obj
 

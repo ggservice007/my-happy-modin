@@ -13,11 +13,11 @@
 
 from abc import ABC
 import numpy as np
-import pandas
+import my_happy_pandas
 
 from my_happy_modin.error_message import ErrorMessage
 from my_happy_modin.data_management.utils import compute_chunksize
-from pandas.api.types import union_categoricals
+from my_happy_pandas.api.types import union_categoricals
 
 
 class BaseFrameManager(ABC):
@@ -236,7 +236,7 @@ class BaseFrameManager(ABC):
             right = right.T
 
         for i in range(len(right)):
-            new_right[i] = pandas.concat(
+            new_right[i] = my_happy_pandas.concat(
                 [right[i][j].get() for j in range(len(right[i]))], axis=axis ^ 1
             )
         right = new_right.T if axis else new_right
@@ -516,9 +516,9 @@ class BaseFrameManager(ABC):
         for col in categoricals_columns:
             uc = union_categoricals([df[col] for df in dfs])
             for df in dfs:
-                df[col] = pandas.Categorical(df[col], categories=uc.categories)
+                df[col] = my_happy_pandas.Categorical(df[col], categories=uc.categories)
 
-        return pandas.concat(dfs)
+        return my_happy_pandas.concat(dfs)
 
     @classmethod
     def to_pandas(cls, partitions):
@@ -530,11 +530,11 @@ class BaseFrameManager(ABC):
         """
         retrieved_objects = [[obj.to_pandas() for obj in part] for part in partitions]
         if all(
-            isinstance(part, pandas.Series) for row in retrieved_objects for part in row
+            isinstance(part, my_happy_pandas.Series) for row in retrieved_objects for part in row
         ):
             axis = 0
         elif all(
-            isinstance(part, pandas.DataFrame)
+            isinstance(part, my_happy_pandas.DataFrame)
             for row in retrieved_objects
             for part in row
         ):
@@ -542,12 +542,12 @@ class BaseFrameManager(ABC):
         else:
             ErrorMessage.catch_bugs_and_request_email(True)
         df_rows = [
-            pandas.concat([part for part in row], axis=axis)
+            my_happy_pandas.concat([part for part in row], axis=axis)
             for row in retrieved_objects
             if not all(part.empty for part in row)
         ]
         if len(df_rows) == 0:
-            return pandas.DataFrame()
+            return my_happy_pandas.DataFrame()
         else:
             return cls.concatenate(df_rows)
 
@@ -640,7 +640,7 @@ class BaseFrameManager(ABC):
         -------
             Number of partitions.
         """
-        from my_happy_modin.pandas import DEFAULT_NPARTITIONS
+        from my_happy_modin.my_happy_pandas import DEFAULT_NPARTITIONS
 
         return DEFAULT_NPARTITIONS
 

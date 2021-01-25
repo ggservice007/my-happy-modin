@@ -11,7 +11,7 @@
 # ANY KIND, either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-import pandas
+import my_happy_pandas
 
 from my_happy_modin.engines.base.io import BaseIO
 
@@ -22,7 +22,7 @@ class RayIO(BaseIO):
         """Write records stored in a DataFrame to a SQL database.
         Args:
             qc: the query compiler of the DF that we want to run to_sql on
-            kwargs: parameters for pandas.to_sql(**kwargs)
+            kwargs: parameters for my_happy_pandas.to_sql(**kwargs)
         """
         # we first insert an empty DF in order to create the full table in the database
         # This also helps to validate the input against pandas
@@ -39,7 +39,7 @@ class RayIO(BaseIO):
         def func(df):
             df.columns = columns
             df.to_sql(**kwargs)
-            return pandas.DataFrame()
+            return my_happy_pandas.DataFrame()
 
         result = qc._modin_frame._apply_full_axis(1, func, new_index=[], new_columns=[])
         # blocking operation

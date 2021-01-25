@@ -24,10 +24,10 @@ Manually add documentation for methods which are not presented in pandas.
 
 import numpy as np
 from numpy import nan
-import pandas
-from pandas.compat import numpy as numpy_compat
-from pandas.core.common import count_not_none, pipe
-from pandas.core.dtypes.common import (
+import my_happy_pandas
+from my_happy_pandas.compat import numpy as numpy_compat
+from my_happy_pandas.core.common import count_not_none, pipe
+from my_happy_pandas.core.dtypes.common import (
     is_list_like,
     is_dict_like,
     is_numeric_dtype,
@@ -35,12 +35,12 @@ from pandas.core.dtypes.common import (
     is_dtype_equal,
     is_object_dtype,
 )
-import pandas.core.window.rolling
-import pandas.core.resample
-from pandas.core.indexing import convert_to_index_sliceable
-from pandas.util._validators import validate_bool_kwarg, validate_percentile
-from pandas._libs.lib import no_default
-from pandas._typing import (
+import my_happy_pandas.core.window.rolling
+import my_happy_pandas.core.resample
+from my_happy_pandas.core.indexing import convert_to_index_sliceable
+from my_happy_pandas.util._validators import validate_bool_kwarg, validate_percentile
+from my_happy_pandas._libs.lib import no_default
+from my_happy_pandas._typing import (
     TimedeltaConvertibleTypes,
     TimestampConvertibleTypes,
     IndexKeyFunc,
@@ -52,7 +52,7 @@ import pickle as pkl
 
 from my_happy_modin.utils import try_cast_to_pandas, _inherit_docstrings
 from my_happy_modin.error_message import ErrorMessage
-from my_happy_modin.pandas.utils import is_scalar
+from my_happy_modin.my_happy_pandas.utils import is_scalar
 from my_happy_modin.config import IsExperimental
 
 # Similar to pandas, sentinel value to use as kwarg in place of None when None has
@@ -122,7 +122,7 @@ class BasePandasDataset(object):
         if len(self.index) == 0 or (
             hasattr(self, "columns") and len(self.columns) == 0
         ):
-            return pandas.DataFrame(
+            return my_happy_pandas.DataFrame(
                 index=self.index,
                 columns=self.columns if hasattr(self, "columns") else None,
             )
@@ -385,22 +385,22 @@ class BasePandasDataset(object):
         # SparseDataFrames cannot be serialized by arrow and cause problems for my_happy_modin.
         # For now we will use pandas.
         if isinstance(result, type(self)) and not isinstance(
-            result, (pandas.SparseDataFrame, pandas.SparseSeries)
+            result, (my_happy_pandas.SparseDataFrame, my_happy_pandas.SparseSeries)
         ):
             return self._create_or_update_from_compiler(
                 result, inplace=kwargs.get("inplace", False)
             )
-        elif isinstance(result, pandas.DataFrame):
+        elif isinstance(result, my_happy_pandas.DataFrame):
             from .dataframe import DataFrame
 
             return DataFrame(result)
-        elif isinstance(result, pandas.Series):
+        elif isinstance(result, my_happy_pandas.Series):
             from .series import Series
 
             return Series(result)
         # inplace
         elif result is None:
-            import my_happy_modin.pandas as pd
+            import my_happy_modin.my_happy_pandas as pd
 
             return self._create_or_update_from_compiler(
                 getattr(pd, type(pandas_obj).__name__)(pandas_obj)._query_compiler,
@@ -411,11 +411,11 @@ class BasePandasDataset(object):
                 if (
                     isinstance(result, (list, tuple))
                     and len(result) == 2
-                    and isinstance(result[0], pandas.DataFrame)
+                    and isinstance(result[0], my_happy_pandas.DataFrame)
                 ):
                     # Some operations split the DataFrame into two (e.g. align). We need to wrap
                     # both of the returned results
-                    if isinstance(result[1], pandas.DataFrame):
+                    if isinstance(result[1], my_happy_pandas.DataFrame):
                         second = self.__constructor__(result[1])
                     else:
                         second = result[1]
@@ -730,13 +730,13 @@ class BasePandasDataset(object):
 
     def asof(self, where, subset=None):
         scalar = not is_list_like(where)
-        if isinstance(where, pandas.Index):
+        if isinstance(where, my_happy_pandas.Index):
             # Prevent accidental mutation of original:
             where = where.copy()
         else:
             if scalar:
                 where = [where]
-            where = pandas.Index(where)
+            where = my_happy_pandas.Index(where)
 
         if subset is None:
             data = self
@@ -744,7 +744,7 @@ class BasePandasDataset(object):
             # Only relevant for DataFrames:
             data = self[subset]
         no_na_index = data.dropna().index
-        new_index = pandas.Index([no_na_index.asof(i) for i in where])
+        new_index = my_happy_pandas.Index([no_na_index.asof(i) for i in where])
         result = self.reindex(new_index)
         result.index = where
 
@@ -781,7 +781,7 @@ class BasePandasDataset(object):
     def at_time(self, time, asof=False, axis=None):
         axis = self._get_axis_number(axis)
         idx = self.index if axis == 0 else self.columns
-        indexer = pandas.Series(index=idx).at_time(time, asof=asof).index
+        indexer = my_happy_pandas.Series(index=idx).at_time(time, asof=asof).index
         return self.loc[indexer] if axis == 0 else self.loc[:, indexer]
 
     def between_time(
@@ -790,7 +790,7 @@ class BasePandasDataset(object):
         axis = self._get_axis_number(axis)
         idx = self.index if axis == 0 else self.columns
         indexer = (
-            pandas.Series(index=idx)
+            my_happy_pandas.Series(index=idx)
             .between_time(
                 start_time,
                 end_time,
@@ -1006,10 +1006,10 @@ class BasePandasDataset(object):
         if labels is not None:
             if index is not None or columns is not None:
                 raise ValueError("Cannot specify both 'labels' and 'index'/'columns'")
-            axis = pandas.DataFrame()._get_axis_name(axis)
+            axis = my_happy_pandas.DataFrame()._get_axis_name(axis)
             axes = {axis: labels}
         elif index is not None or columns is not None:
-            axes, _ = pandas.DataFrame()._construct_axes_from_arguments(
+            axes, _ = my_happy_pandas.DataFrame()._construct_axes_from_arguments(
                 (index, columns), {}
             )
         else:
@@ -1241,7 +1241,7 @@ class BasePandasDataset(object):
         return self[self.columns[bool_arr]]
 
     def first(self, offset):
-        return self.loc[pandas.Series(index=self.index).first(offset).index]
+        return self.loc[my_happy_pandas.Series(index=self.index).first(offset).index]
 
     def first_valid_index(self):
         return self._query_compiler.first_valid_index()
@@ -1353,7 +1353,7 @@ class BasePandasDataset(object):
     kurtosis = kurt
 
     def last(self, offset):
-        return self.loc[pandas.Series(index=self.index).last(offset).index]
+        return self.loc[my_happy_pandas.Series(index=self.index).last(offset).index]
 
     def last_valid_index(self):
         return self._query_compiler.last_valid_index()
@@ -1595,7 +1595,7 @@ class BasePandasDataset(object):
         validate_percentile(q)
         axis = self._get_axis_number(axis)
 
-        if isinstance(q, (pandas.Series, np.ndarray, pandas.Index, list)):
+        if isinstance(q, (my_happy_pandas.Series, np.ndarray, my_happy_pandas.Index, list)):
             return self.__constructor__(
                 query_compiler=self._query_compiler.quantile_for_list_of_values(
                     q=q,
@@ -1682,8 +1682,8 @@ class BasePandasDataset(object):
             columns = labels
         new_query_compiler = None
         if index is not None:
-            if not isinstance(index, pandas.Index):
-                index = pandas.Index(index)
+            if not isinstance(index, my_happy_pandas.Index):
+                index = my_happy_pandas.Index(index)
             if not index.equals(self.index):
                 new_query_compiler = self._query_compiler.reindex(
                     axis=0,
@@ -1697,8 +1697,8 @@ class BasePandasDataset(object):
             new_query_compiler = self._query_compiler
         final_query_compiler = None
         if columns is not None:
-            if not isinstance(columns, pandas.Index):
-                columns = pandas.Index(columns)
+            if not isinstance(columns, my_happy_pandas.Index):
+                columns = my_happy_pandas.Index(columns)
             if not columns.equals(self.columns):
                 final_query_compiler = new_query_compiler.reindex(
                     axis=1,
@@ -1922,7 +1922,7 @@ class BasePandasDataset(object):
             axis_length = len(axis_labels)
         else:
             # Getting rows requires indices instead of labels. RangeIndex provides this.
-            axis_labels = pandas.RangeIndex(len(self.index))
+            axis_labels = my_happy_pandas.RangeIndex(len(self.index))
             axis_length = len(axis_labels)
         if weights is not None:
             # Index of the weights Series should correspond to the index of the
@@ -1943,7 +1943,7 @@ class BasePandasDataset(object):
                         "weights when sampling from rows on "
                         "a DataFrame"
                     )
-            weights = pandas.Series(weights, dtype="float64")
+            weights = my_happy_pandas.Series(weights, dtype="float64")
 
             if len(weights) != axis_length:
                 raise ValueError(
@@ -2046,7 +2046,7 @@ class BasePandasDataset(object):
             )
             labels, axis = axis, labels
         if inplace:
-            setattr(self, pandas.DataFrame()._get_axis_name(axis), labels)
+            setattr(self, my_happy_pandas.DataFrame()._get_axis_name(axis), labels)
         else:
             obj = self.copy()
             obj.set_axis(labels, axis=axis, inplace=True)
@@ -2063,7 +2063,7 @@ class BasePandasDataset(object):
                 fill_index = self.index
                 empty_frame = True
             else:
-                fill_index = pandas.RangeIndex(start=0, stop=abs(periods), step=1)
+                fill_index = my_happy_pandas.RangeIndex(start=0, stop=abs(periods), step=1)
         else:
             fill_index = self.index
         from .dataframe import DataFrame
@@ -2075,7 +2075,7 @@ class BasePandasDataset(object):
                     fill_columns = self.columns
                     empty_frame = True
                 else:
-                    fill_columns = pandas.RangeIndex(start=0, stop=abs(periods), step=1)
+                    fill_columns = my_happy_pandas.RangeIndex(start=0, stop=abs(periods), step=1)
             else:
                 fill_columns = self.columns
 
@@ -2490,7 +2490,7 @@ class BasePandasDataset(object):
             if not index_label:
                 index_label = "index"
             new_query_compiler = new_query_compiler.insert(0, index_label, self.index)
-            # so pandas._to_sql will not write the index to the database as well
+            # so my_happy_pandas._to_sql will not write the index to the database as well
             index = False
 
         from my_happy_modin.data_management.factories.dispatcher import EngineDispatcher
@@ -2553,7 +2553,7 @@ class BasePandasDataset(object):
         axis = self._get_axis_number(axis)
         if level is not None:
             new_labels = (
-                pandas.Series(index=self.axes[axis]).tz_convert(tz, level=level).index
+                my_happy_pandas.Series(index=self.axes[axis]).tz_convert(tz, level=level).index
             )
         else:
             new_labels = self.axes[axis].tz_convert(tz)
@@ -2565,7 +2565,7 @@ class BasePandasDataset(object):
     ):
         axis = self._get_axis_number(axis)
         new_labels = (
-            pandas.Series(index=self.axes[axis])
+            my_happy_pandas.Series(index=self.axes[axis])
             .tz_localize(
                 tz,
                 axis=axis,
@@ -2758,9 +2758,9 @@ if IsExperimental.get():
 
 
 @_inherit_docstrings(
-    pandas.core.resample.Resampler,
+    my_happy_pandas.core.resample.Resampler,
     excluded=[
-        pandas.core.resample.Resampler.__init__,
+        my_happy_pandas.core.resample.Resampler.__init__,
     ],
 )
 class Resampler(object):
@@ -2819,7 +2819,7 @@ class Resampler(object):
         else:
             df = self._dataframe.T
         groups = df.groupby(
-            pandas.Grouper(
+            my_happy_pandas.Grouper(
                 key=on,
                 freq=rule,
                 closed=closed,
@@ -2837,13 +2837,13 @@ class Resampler(object):
     @property
     def groups(self):
         return self._query_compiler.default_to_pandas(
-            lambda df: pandas.DataFrame.resample(df, *self.resample_args).groups
+            lambda df: my_happy_pandas.DataFrame.resample(df, *self.resample_args).groups
         )
 
     @property
     def indices(self):
         return self._query_compiler.default_to_pandas(
-            lambda df: pandas.DataFrame.resample(df, *self.resample_args).indices
+            lambda df: my_happy_pandas.DataFrame.resample(df, *self.resample_args).indices
         )
 
     def get_group(self, name, obj=None):
@@ -3135,9 +3135,9 @@ class Resampler(object):
 
 
 @_inherit_docstrings(
-    pandas.core.window.rolling.Window,
+    my_happy_pandas.core.window.rolling.Window,
     excluded=[
-        pandas.core.window.rolling.Window.__init__,
+        my_happy_pandas.core.window.rolling.Window.__init__,
     ],
 )
 class Window(object):
@@ -3194,9 +3194,9 @@ class Window(object):
 
 
 @_inherit_docstrings(
-    pandas.core.window.rolling.Rolling,
+    my_happy_pandas.core.window.rolling.Rolling,
     excluded=[
-        pandas.core.window.rolling.Rolling.__init__,
+        my_happy_pandas.core.window.rolling.Rolling.__init__,
     ],
 )
 class Rolling(object):

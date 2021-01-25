@@ -25,9 +25,9 @@ from my_happy_modin.data_management.functions.default_methods import (
 )
 from my_happy_modin.error_message import ErrorMessage
 
-from pandas.core.dtypes.common import is_scalar
-import pandas.core.resample
-import pandas
+from my_happy_pandas.core.dtypes.common import is_scalar
+import my_happy_pandas.core.resample
+import my_happy_pandas
 import numpy as np
 
 
@@ -41,7 +41,7 @@ def _get_axis(axis):
 
 def _set_axis(axis):
     def axis_setter(self, labels):
-        new_qc = DataFrameDefault.register(pandas.DataFrame.set_axis)(
+        new_qc = DataFrameDefault.register(my_happy_pandas.DataFrame.set_axis)(
             self, axis=axis, labels=labels
         )
         self.__dict__.update(new_qc.__dict__)
@@ -87,19 +87,19 @@ class BaseQueryCompiler(abc.ABC):
     # Metadata modification abstract methods
     def add_prefix(self, prefix, axis=1):
         if axis:
-            return DataFrameDefault.register(pandas.DataFrame.add_prefix)(
+            return DataFrameDefault.register(my_happy_pandas.DataFrame.add_prefix)(
                 self, prefix=prefix
             )
         else:
-            return SeriesDefault.register(pandas.Series.add_prefix)(self, prefix=prefix)
+            return SeriesDefault.register(my_happy_pandas.Series.add_prefix)(self, prefix=prefix)
 
     def add_suffix(self, suffix, axis=1):
         if axis:
-            return DataFrameDefault.register(pandas.DataFrame.add_suffix)(
+            return DataFrameDefault.register(my_happy_pandas.DataFrame.add_suffix)(
                 self, suffix=suffix
             )
         else:
-            return SeriesDefault.register(pandas.Series.add_suffix)(self, suffix=suffix)
+            return SeriesDefault.register(my_happy_pandas.Series.add_suffix)(self, suffix=suffix)
 
     # END Metadata modification abstract methods
 
@@ -108,7 +108,7 @@ class BaseQueryCompiler(abc.ABC):
     # copies if we end up modifying something here. We copy all of the metadata
     # to prevent that.
     def copy(self):
-        return DataFrameDefault.register(pandas.DataFrame.copy)(self)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.copy)(self)
 
     # END Abstract copy
 
@@ -133,7 +133,7 @@ class BaseQueryCompiler(abc.ABC):
                 if not isinstance(other, list):
                     other = [other]
                 other = [df] + other
-                result = pandas.concat(other, axis=axis, **kwargs)
+                result = my_happy_pandas.concat(other, axis=axis, **kwargs)
             else:
                 if isinstance(other, (list, np.ndarray)) and len(other) == 1:
                     other = other[0]
@@ -144,7 +144,7 @@ class BaseQueryCompiler(abc.ABC):
                 if axis == 0:
                     result = result.reset_index(drop=True)
                 else:
-                    result.columns = pandas.RangeIndex(len(result.columns))
+                    result.columns = my_happy_pandas.RangeIndex(len(result.columns))
             return result
 
         return DataFrameDefault.register(concat)(self, axis=axis, other=other, **kwargs)
@@ -177,7 +177,7 @@ class BaseQueryCompiler(abc.ABC):
 
         Parameters
         ----------
-        df: pandas.DataFrame
+        df: my_happy_pandas.DataFrame
             The pandas DataFrame to convert from.
         data_cls :
             my_happy_modin DataFrame object to convert to.
@@ -223,7 +223,7 @@ class BaseQueryCompiler(abc.ABC):
         -------
             NumPy array of the QueryCompiler.
         """
-        return DataFrameDefault.register(pandas.DataFrame.to_numpy)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.to_numpy)(self, **kwargs)
 
     # END To NumPy
 
@@ -234,138 +234,138 @@ class BaseQueryCompiler(abc.ABC):
     # result in NaN values.
 
     def add(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.add)(self, other=other, **kwargs)
+        return BinaryDefault.register(my_happy_pandas.DataFrame.add)(self, other=other, **kwargs)
 
     def combine(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.combine)(
+        return BinaryDefault.register(my_happy_pandas.DataFrame.combine)(
             self, other=other, **kwargs
         )
 
     def combine_first(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.combine_first)(
+        return BinaryDefault.register(my_happy_pandas.DataFrame.combine_first)(
             self, other=other, **kwargs
         )
 
     def eq(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.eq)(self, other=other, **kwargs)
+        return BinaryDefault.register(my_happy_pandas.DataFrame.eq)(self, other=other, **kwargs)
 
     def floordiv(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.floordiv)(
+        return BinaryDefault.register(my_happy_pandas.DataFrame.floordiv)(
             self, other=other, **kwargs
         )
 
     def ge(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.ge)(self, other=other, **kwargs)
+        return BinaryDefault.register(my_happy_pandas.DataFrame.ge)(self, other=other, **kwargs)
 
     def gt(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.gt)(self, other=other, **kwargs)
+        return BinaryDefault.register(my_happy_pandas.DataFrame.gt)(self, other=other, **kwargs)
 
     def le(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.le)(self, other=other, **kwargs)
+        return BinaryDefault.register(my_happy_pandas.DataFrame.le)(self, other=other, **kwargs)
 
     def lt(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.lt)(self, other=other, **kwargs)
+        return BinaryDefault.register(my_happy_pandas.DataFrame.lt)(self, other=other, **kwargs)
 
     def mod(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.mod)(self, other=other, **kwargs)
+        return BinaryDefault.register(my_happy_pandas.DataFrame.mod)(self, other=other, **kwargs)
 
     def mul(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.mul)(self, other=other, **kwargs)
+        return BinaryDefault.register(my_happy_pandas.DataFrame.mul)(self, other=other, **kwargs)
 
     def corr(self, **kwargs):
-        return DataFrameDefault.register(pandas.DataFrame.corr)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.corr)(self, **kwargs)
 
     def cov(self, **kwargs):
-        return DataFrameDefault.register(pandas.DataFrame.cov)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.cov)(self, **kwargs)
 
     def dot(self, other, **kwargs):
         if kwargs.get("squeeze_self", False):
-            applyier = pandas.Series.dot
+            applyier = my_happy_pandas.Series.dot
         else:
-            applyier = pandas.DataFrame.dot
+            applyier = my_happy_pandas.DataFrame.dot
         return BinaryDefault.register(applyier)(self, other=other, **kwargs)
 
     def ne(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.ne)(self, other=other, **kwargs)
+        return BinaryDefault.register(my_happy_pandas.DataFrame.ne)(self, other=other, **kwargs)
 
     def pow(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.pow)(self, other=other, **kwargs)
+        return BinaryDefault.register(my_happy_pandas.DataFrame.pow)(self, other=other, **kwargs)
 
     def rfloordiv(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.rfloordiv)(
+        return BinaryDefault.register(my_happy_pandas.DataFrame.rfloordiv)(
             self, other=other, **kwargs
         )
 
     def rmod(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.rmod)(
+        return BinaryDefault.register(my_happy_pandas.DataFrame.rmod)(
             self, other=other, **kwargs
         )
 
     def rpow(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.rpow)(
+        return BinaryDefault.register(my_happy_pandas.DataFrame.rpow)(
             self, other=other, **kwargs
         )
 
     def rsub(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.rsub)(
+        return BinaryDefault.register(my_happy_pandas.DataFrame.rsub)(
             self, other=other, **kwargs
         )
 
     def rtruediv(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.rtruediv)(
+        return BinaryDefault.register(my_happy_pandas.DataFrame.rtruediv)(
             self, other=other, **kwargs
         )
 
     def sub(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.sub)(self, other=other, **kwargs)
+        return BinaryDefault.register(my_happy_pandas.DataFrame.sub)(self, other=other, **kwargs)
 
     def truediv(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.truediv)(
+        return BinaryDefault.register(my_happy_pandas.DataFrame.truediv)(
             self, other=other, **kwargs
         )
 
     def __and__(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.__and__)(
+        return BinaryDefault.register(my_happy_pandas.DataFrame.__and__)(
             self, other=other, **kwargs
         )
 
     def __or__(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.__or__)(
+        return BinaryDefault.register(my_happy_pandas.DataFrame.__or__)(
             self, other=other, **kwargs
         )
 
     def __rand__(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.__rand__)(
+        return BinaryDefault.register(my_happy_pandas.DataFrame.__rand__)(
             self, other=other, **kwargs
         )
 
     def __ror__(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.__ror__)(
+        return BinaryDefault.register(my_happy_pandas.DataFrame.__ror__)(
             self, other=other, **kwargs
         )
 
     def __rxor__(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.__rxor__)(
+        return BinaryDefault.register(my_happy_pandas.DataFrame.__rxor__)(
             self, other=other, **kwargs
         )
 
     def __xor__(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.__xor__)(
+        return BinaryDefault.register(my_happy_pandas.DataFrame.__xor__)(
             self, other=other, **kwargs
         )
 
     def df_update(self, other, **kwargs):
-        return BinaryDefault.register(pandas.DataFrame.update, inplace=True)(
+        return BinaryDefault.register(my_happy_pandas.DataFrame.update, inplace=True)(
             self, other=other, **kwargs
         )
 
     def series_update(self, other, **kwargs):
-        return BinaryDefault.register(pandas.Series.update, inplace=True)(
+        return BinaryDefault.register(my_happy_pandas.Series.update, inplace=True)(
             self, other=other, squeeze_self=True, squeeze_other=True, **kwargs
         )
 
     def clip(self, lower, upper, **kwargs):
-        return DataFrameDefault.register(pandas.DataFrame.clip)(
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.clip)(
             self, lower=lower, upper=upper, **kwargs
         )
 
@@ -378,7 +378,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             New QueryCompiler with updated data and index.
         """
-        return DataFrameDefault.register(pandas.DataFrame.where)(
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.where)(
             self, cond=cond, other=other, **kwargs
         )
 
@@ -400,7 +400,7 @@ class BaseQueryCompiler(abc.ABC):
         -----
         See pd.merge or pd.DataFrame.merge for more info on kwargs.
         """
-        return DataFrameDefault.register(pandas.DataFrame.merge)(
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.merge)(
             self, right=right, **kwargs
         )
 
@@ -422,7 +422,7 @@ class BaseQueryCompiler(abc.ABC):
         -----
         See pd.DataFrame.join for more info on kwargs.
         """
-        return DataFrameDefault.register(pandas.DataFrame.join)(self, right, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.join)(self, right, **kwargs)
 
     # END Abstract inter-data operations
 
@@ -433,7 +433,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             Transposed new QueryCompiler.
         """
-        return DataFrameDefault.register(pandas.DataFrame.transpose)(
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.transpose)(
             self, *args, **kwargs
         )
 
@@ -472,7 +472,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             New QueryCompiler with updated data and new index.
         """
-        return DataFrameDefault.register(pandas.DataFrame.reindex)(
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.reindex)(
             self, axis=axis, labels=labels, **kwargs
         )
 
@@ -482,7 +482,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             New QueryCompiler with updated data and reset index.
         """
-        return DataFrameDefault.register(pandas.DataFrame.reset_index)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.reset_index)(self, **kwargs)
 
     # END Abstract reindex/reset_index
 
@@ -500,7 +500,7 @@ class BaseQueryCompiler(abc.ABC):
         -------
             bool
         """
-        return SeriesDefault.register(pandas.Series.is_monotonic)(self)
+        return SeriesDefault.register(my_happy_pandas.Series.is_monotonic)(self)
 
     def is_monotonic_decreasing(self):
         """Return boolean if values in the object are monotonic_decreasing.
@@ -509,7 +509,7 @@ class BaseQueryCompiler(abc.ABC):
         -------
             bool
         """
-        return SeriesDefault.register(pandas.Series.is_monotonic_decreasing)(self)
+        return SeriesDefault.register(my_happy_pandas.Series.is_monotonic_decreasing)(self)
 
     def count(self, **kwargs):
         """Counts the number of non-NaN objects for each column or row.
@@ -517,7 +517,7 @@ class BaseQueryCompiler(abc.ABC):
         Return:
             Pandas series containing counts of non-NaN objects from each column or row.
         """
-        return DataFrameDefault.register(pandas.DataFrame.count)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.count)(self, **kwargs)
 
     def max(self, **kwargs):
         """Returns the maximum value for each column or row.
@@ -525,7 +525,7 @@ class BaseQueryCompiler(abc.ABC):
         Return:
             Pandas series with the maximum values from each column or row.
         """
-        return DataFrameDefault.register(pandas.DataFrame.max)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.max)(self, **kwargs)
 
     def mean(self, **kwargs):
         """Returns the mean for each numerical column or row.
@@ -533,7 +533,7 @@ class BaseQueryCompiler(abc.ABC):
         Return:
             Pandas series containing the mean from each numerical column or row.
         """
-        return DataFrameDefault.register(pandas.DataFrame.mean)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.mean)(self, **kwargs)
 
     def min(self, **kwargs):
         """Returns the minimum from each column or row.
@@ -541,7 +541,7 @@ class BaseQueryCompiler(abc.ABC):
         Return:
             Pandas series with the minimum value from each column or row.
         """
-        return DataFrameDefault.register(pandas.DataFrame.min)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.min)(self, **kwargs)
 
     def prod(self, **kwargs):
         """Returns the product of each numerical column or row.
@@ -549,7 +549,7 @@ class BaseQueryCompiler(abc.ABC):
         Return:
             Pandas series with the product of each numerical column or row.
         """
-        return DataFrameDefault.register(pandas.DataFrame.prod)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.prod)(self, **kwargs)
 
     def sum(self, **kwargs):
         """Returns the sum of each numerical column or row.
@@ -557,20 +557,20 @@ class BaseQueryCompiler(abc.ABC):
         Return:
             Pandas series with the sum of each numerical column or row.
         """
-        return DataFrameDefault.register(pandas.DataFrame.sum)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.sum)(self, **kwargs)
 
     def to_datetime(self, *args, **kwargs):
-        return SeriesDefault.register(pandas.to_datetime)(self, *args, **kwargs)
+        return SeriesDefault.register(my_happy_pandas.to_datetime)(self, *args, **kwargs)
 
     # END Abstract full Reduce operations
 
     # Abstract map partitions operations
     # These operations are operations that apply a function to every partition.
     def abs(self):
-        return DataFrameDefault.register(pandas.DataFrame.abs)(self)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.abs)(self)
 
     def applymap(self, func):
-        return DataFrameDefault.register(pandas.DataFrame.applymap)(self, func=func)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.applymap)(self, func=func)
 
     def conj(self, **kwargs):
         """
@@ -581,47 +581,47 @@ class BaseQueryCompiler(abc.ABC):
         """
 
         def conj(df, *args, **kwargs):
-            return pandas.DataFrame(np.conj(df))
+            return my_happy_pandas.DataFrame(np.conj(df))
 
         return DataFrameDefault.register(conj)(self, **kwargs)
 
     def isin(self, **kwargs):
-        return DataFrameDefault.register(pandas.DataFrame.isin)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.isin)(self, **kwargs)
 
     def isna(self):
-        return DataFrameDefault.register(pandas.DataFrame.isna)(self)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.isna)(self)
 
     def negative(self, **kwargs):
-        return DataFrameDefault.register(pandas.DataFrame.__neg__)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.__neg__)(self, **kwargs)
 
     def notna(self):
-        return DataFrameDefault.register(pandas.DataFrame.notna)(self)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.notna)(self)
 
     def round(self, **kwargs):
-        return DataFrameDefault.register(pandas.DataFrame.round)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.round)(self, **kwargs)
 
     def replace(self, **kwargs):
-        return DataFrameDefault.register(pandas.DataFrame.replace)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.replace)(self, **kwargs)
 
     def series_view(self, **kwargs):
-        return SeriesDefault.register(pandas.Series.view)(self, **kwargs)
+        return SeriesDefault.register(my_happy_pandas.Series.view)(self, **kwargs)
 
     def to_numeric(self, *args, **kwargs):
-        return SeriesDefault.register(pandas.to_numeric)(self, *args, **kwargs)
+        return SeriesDefault.register(my_happy_pandas.to_numeric)(self, *args, **kwargs)
 
     def unique(self, **kwargs):
-        return SeriesDefault.register(pandas.Series.unique)(self, **kwargs)
+        return SeriesDefault.register(my_happy_pandas.Series.unique)(self, **kwargs)
 
     def searchsorted(self, **kwargs):
-        return SeriesDefault.register(pandas.Series.searchsorted)(self, **kwargs)
+        return SeriesDefault.register(my_happy_pandas.Series.searchsorted)(self, **kwargs)
 
     # END Abstract map partitions operations
 
     def value_counts(self, **kwargs):
-        return SeriesDefault.register(pandas.Series.value_counts)(self, **kwargs)
+        return SeriesDefault.register(my_happy_pandas.Series.value_counts)(self, **kwargs)
 
     def stack(self, level, dropna):
-        return DataFrameDefault.register(pandas.DataFrame.stack)(
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.stack)(
             self, level=level, dropna=dropna
         )
 
@@ -636,7 +636,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             DataFrame with updated dtypes.
         """
-        return DataFrameDefault.register(pandas.DataFrame.astype)(
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.astype)(
             self, dtype=col_dtypes, **kwargs
         )
 
@@ -658,7 +658,7 @@ class BaseQueryCompiler(abc.ABC):
         Return:
             Pandas Series containing boolean values or boolean.
         """
-        return DataFrameDefault.register(pandas.DataFrame.all)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.all)(self, **kwargs)
 
     def any(self, **kwargs):
         """Returns whether any the elements are true, potentially over an axis.
@@ -666,7 +666,7 @@ class BaseQueryCompiler(abc.ABC):
         Return:
             Pandas Series containing boolean values or boolean.
         """
-        return DataFrameDefault.register(pandas.DataFrame.any)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.any)(self, **kwargs)
 
     def first_valid_index(self):
         """Returns index of first non-NaN/NULL value.
@@ -675,7 +675,7 @@ class BaseQueryCompiler(abc.ABC):
             Scalar of index name.
         """
         return (
-            DataFrameDefault.register(pandas.DataFrame.first_valid_index)(self)
+            DataFrameDefault.register(my_happy_pandas.DataFrame.first_valid_index)(self)
             .to_pandas()
             .squeeze()
         )
@@ -686,7 +686,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             Series containing the maximum of each column or axis.
         """
-        return DataFrameDefault.register(pandas.DataFrame.idxmax)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.idxmax)(self, **kwargs)
 
     def idxmin(self, **kwargs):
         """Returns the first occurance of the minimum over requested axis.
@@ -694,7 +694,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             Series containing the minimum of each column or axis.
         """
-        return DataFrameDefault.register(pandas.DataFrame.idxmin)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.idxmin)(self, **kwargs)
 
     def last_valid_index(self):
         """Returns index of last non-NaN/NULL value.
@@ -703,7 +703,7 @@ class BaseQueryCompiler(abc.ABC):
             Scalar of index name.
         """
         return (
-            DataFrameDefault.register(pandas.DataFrame.last_valid_index)(self)
+            DataFrameDefault.register(my_happy_pandas.DataFrame.last_valid_index)(self)
             .to_pandas()
             .squeeze()
         )
@@ -714,7 +714,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             Series containing the median of each column or row.
         """
-        return DataFrameDefault.register(pandas.DataFrame.median)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.median)(self, **kwargs)
 
     def memory_usage(self, **kwargs):
         """Returns the memory usage of each column.
@@ -722,7 +722,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             Series containing the memory usage of each column.
         """
-        return DataFrameDefault.register(pandas.DataFrame.memory_usage)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.memory_usage)(self, **kwargs)
 
     def nunique(self, **kwargs):
         """Returns the number of unique items over each column or row.
@@ -730,7 +730,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             Series of ints indexed by column or index names.
         """
-        return DataFrameDefault.register(pandas.DataFrame.nunique)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.nunique)(self, **kwargs)
 
     def quantile_for_single_value(self, **kwargs):
         """Returns quantile of each column or row.
@@ -738,7 +738,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             Series containing the quantile of each column or row.
         """
-        return DataFrameDefault.register(pandas.DataFrame.quantile)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.quantile)(self, **kwargs)
 
     def skew(self, **kwargs):
         """Returns skew of each column or row.
@@ -746,7 +746,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             Series containing the skew of each column or row.
         """
-        return DataFrameDefault.register(pandas.DataFrame.skew)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.skew)(self, **kwargs)
 
     def sem(self, **kwargs):
         """
@@ -757,7 +757,7 @@ class BaseQueryCompiler(abc.ABC):
         BaseQueryCompiler
             QueryCompiler containing the standard deviation of the mean over requested axis.
         """
-        return DataFrameDefault.register(pandas.DataFrame.sem)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.sem)(self, **kwargs)
 
     def std(self, **kwargs):
         """Returns standard deviation of each column or row.
@@ -765,7 +765,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             Series containing the standard deviation of each column or row.
         """
-        return DataFrameDefault.register(pandas.DataFrame.std)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.std)(self, **kwargs)
 
     def var(self, **kwargs):
         """Returns variance of each column or row.
@@ -773,7 +773,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             Series containing the variance of each column or row.
         """
-        return DataFrameDefault.register(pandas.DataFrame.var)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.var)(self, **kwargs)
 
     # END Abstract column/row partitions reduce operations
 
@@ -789,7 +789,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             DataFrame object containing the descriptive statistics of the DataFrame.
         """
-        return DataFrameDefault.register(pandas.DataFrame.describe)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.describe)(self, **kwargs)
 
     # END Abstract column/row partitions reduce operations over select indices
 
@@ -798,40 +798,40 @@ class BaseQueryCompiler(abc.ABC):
     # that is being operated on. This means that we have to put all of that
     # data in the same place.
     def cumsum(self, **kwargs):
-        return DataFrameDefault.register(pandas.DataFrame.cumsum)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.cumsum)(self, **kwargs)
 
     def cummax(self, **kwargs):
-        return DataFrameDefault.register(pandas.DataFrame.cummax)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.cummax)(self, **kwargs)
 
     def cummin(self, **kwargs):
-        return DataFrameDefault.register(pandas.DataFrame.cummin)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.cummin)(self, **kwargs)
 
     def cumprod(self, **kwargs):
-        return DataFrameDefault.register(pandas.DataFrame.cumprod)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.cumprod)(self, **kwargs)
 
     def diff(self, **kwargs):
-        return DataFrameDefault.register(pandas.DataFrame.diff)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.diff)(self, **kwargs)
 
     def dropna(self, **kwargs):
         """Returns a new QueryCompiler with null values dropped along given axis.
         Return:
             New QueryCompiler
         """
-        return DataFrameDefault.register(pandas.DataFrame.dropna)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.dropna)(self, **kwargs)
 
     def nlargest(self, n=5, columns=None, keep="first"):
         if columns is None:
-            return SeriesDefault.register(pandas.Series.nlargest)(self, n=n, keep=keep)
+            return SeriesDefault.register(my_happy_pandas.Series.nlargest)(self, n=n, keep=keep)
         else:
-            return DataFrameDefault.register(pandas.DataFrame.nlargest)(
+            return DataFrameDefault.register(my_happy_pandas.DataFrame.nlargest)(
                 self, n=n, columns=columns, keep=keep
             )
 
     def nsmallest(self, n=5, columns=None, keep="first"):
         if columns is None:
-            return SeriesDefault.register(pandas.Series.nsmallest)(self, n=n, keep=keep)
+            return SeriesDefault.register(my_happy_pandas.Series.nsmallest)(self, n=n, keep=keep)
         else:
-            return DataFrameDefault.register(pandas.DataFrame.nsmallest)(
+            return DataFrameDefault.register(my_happy_pandas.DataFrame.nsmallest)(
                 self, n=n, columns=columns, keep=keep
             )
 
@@ -844,7 +844,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             A new QueryCompiler with new columns after applying expr.
         """
-        return DataFrameDefault.register(pandas.DataFrame.eval)(
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.eval)(
             self, expr=expr, **kwargs
         )
 
@@ -854,7 +854,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             A new QueryCompiler with modes calculated.
         """
-        return DataFrameDefault.register(pandas.DataFrame.mode)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.mode)(self, **kwargs)
 
     def fillna(self, **kwargs):
         """Replaces NaN values with the method provided.
@@ -862,7 +862,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             A new QueryCompiler with null values filled.
         """
-        return DataFrameDefault.register(pandas.DataFrame.fillna)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.fillna)(self, **kwargs)
 
     def query(self, expr, **kwargs):
         """Query columns of the QueryCompiler with a boolean expression.
@@ -873,7 +873,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             QueryCompiler containing the rows where the boolean expression is satisfied.
         """
-        return DataFrameDefault.register(pandas.DataFrame.query)(
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.query)(
             self, expr=expr, **kwargs
         )
 
@@ -883,7 +883,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             QueryCompiler containing the ranks of the values along an axis.
         """
-        return DataFrameDefault.register(pandas.DataFrame.rank)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.rank)(self, **kwargs)
 
     def sort_index(self, **kwargs):
         """Sorts the data with respect to either the columns or the indices.
@@ -891,18 +891,18 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             QueryCompiler containing the data sorted by columns or indices.
         """
-        return DataFrameDefault.register(pandas.DataFrame.sort_index)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.sort_index)(self, **kwargs)
 
     def melt(self, *args, **kwargs):
-        return DataFrameDefault.register(pandas.DataFrame.melt)(self, *args, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.melt)(self, *args, **kwargs)
 
     def sort_columns_by_row_values(self, rows, ascending=True, **kwargs):
-        return DataFrameDefault.register(pandas.DataFrame.sort_values)(
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.sort_values)(
             self, by=rows, axis=1, ascending=ascending, **kwargs
         )
 
     def sort_rows_by_column_values(self, rows, ascending=True, **kwargs):
-        return DataFrameDefault.register(pandas.DataFrame.sort_values)(
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.sort_values)(
             self, by=rows, axis=0, ascending=ascending, **kwargs
         )
 
@@ -918,7 +918,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             QueryCompiler containing quantiles of original QueryCompiler along an axis.
         """
-        return DataFrameDefault.register(pandas.DataFrame.quantile)(self, **kwargs)
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.quantile)(self, **kwargs)
 
     # END Abstract map across rows/columns
 
@@ -928,7 +928,7 @@ class BaseQueryCompiler(abc.ABC):
         Get column or row data specified by key.
         Parameters
         ----------
-        key : BaseQueryCompiler, numpy.ndarray, pandas.Index or list
+        key : BaseQueryCompiler, numpy.ndarray, my_happy_pandas.Index or list
             Target numeric indices or labels by which to retrieve data.
         Returns
         -------
@@ -994,7 +994,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             A new QueryCompiler with new data inserted.
         """
-        return DataFrameDefault.register(pandas.DataFrame.insert, inplace=True)(
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.insert, inplace=True)(
             self, loc=loc, column=column, value=value
         )
 
@@ -1014,7 +1014,7 @@ class BaseQueryCompiler(abc.ABC):
         if index is None and columns is None:
             return self
         else:
-            return DataFrameDefault.register(pandas.DataFrame.drop)(
+            return DataFrameDefault.register(my_happy_pandas.DataFrame.drop)(
                 self, index=index, columns=columns
             )
 
@@ -1033,7 +1033,7 @@ class BaseQueryCompiler(abc.ABC):
         Returns:
             A new QueryCompiler.
         """
-        return DataFrameDefault.register(pandas.DataFrame.apply)(
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.apply)(
             self, func=func, axis=axis, *args, **kwargs
         )
 
@@ -1077,7 +1077,7 @@ class BaseQueryCompiler(abc.ABC):
         -------
         BaseQueryCompiler
         """
-        return GroupByDefault.register(pandas.core.groupby.DataFrameGroupBy.count)(
+        return GroupByDefault.register(my_happy_pandas.core.groupby.DataFrameGroupBy.count)(
             self,
             by=by,
             axis=axis,
@@ -1121,7 +1121,7 @@ class BaseQueryCompiler(abc.ABC):
         -------
         BaseQueryCompiler
         """
-        return GroupByDefault.register(pandas.core.groupby.DataFrameGroupBy.any)(
+        return GroupByDefault.register(my_happy_pandas.core.groupby.DataFrameGroupBy.any)(
             self,
             by=by,
             axis=axis,
@@ -1165,7 +1165,7 @@ class BaseQueryCompiler(abc.ABC):
         -------
         BaseQueryCompiler
         """
-        return GroupByDefault.register(pandas.core.groupby.DataFrameGroupBy.min)(
+        return GroupByDefault.register(my_happy_pandas.core.groupby.DataFrameGroupBy.min)(
             self,
             by=by,
             axis=axis,
@@ -1209,7 +1209,7 @@ class BaseQueryCompiler(abc.ABC):
         -------
         BaseQueryCompiler
         """
-        return GroupByDefault.register(pandas.core.groupby.DataFrameGroupBy.prod)(
+        return GroupByDefault.register(my_happy_pandas.core.groupby.DataFrameGroupBy.prod)(
             self,
             by=by,
             axis=axis,
@@ -1253,7 +1253,7 @@ class BaseQueryCompiler(abc.ABC):
         -------
         BaseQueryCompiler
         """
-        return GroupByDefault.register(pandas.core.groupby.DataFrameGroupBy.max)(
+        return GroupByDefault.register(my_happy_pandas.core.groupby.DataFrameGroupBy.max)(
             self,
             by=by,
             axis=axis,
@@ -1297,7 +1297,7 @@ class BaseQueryCompiler(abc.ABC):
         -------
         BaseQueryCompiler
         """
-        return GroupByDefault.register(pandas.core.groupby.DataFrameGroupBy.all)(
+        return GroupByDefault.register(my_happy_pandas.core.groupby.DataFrameGroupBy.all)(
             self,
             by=by,
             axis=axis,
@@ -1341,7 +1341,7 @@ class BaseQueryCompiler(abc.ABC):
         -------
         BaseQueryCompiler
         """
-        return GroupByDefault.register(pandas.core.groupby.DataFrameGroupBy.sum)(
+        return GroupByDefault.register(my_happy_pandas.core.groupby.DataFrameGroupBy.sum)(
             self,
             by=by,
             axis=axis,
@@ -1385,7 +1385,7 @@ class BaseQueryCompiler(abc.ABC):
         -------
         BaseQueryCompiler
         """
-        return GroupByDefault.register(pandas.core.groupby.DataFrameGroupBy.size)(
+        return GroupByDefault.register(my_happy_pandas.core.groupby.DataFrameGroupBy.size)(
             self,
             by=by,
             axis=axis,
@@ -1413,7 +1413,7 @@ class BaseQueryCompiler(abc.ABC):
         elif isinstance(by, type(self)):
             by = list(by.columns)
 
-        return GroupByDefault.register(pandas.core.groupby.DataFrameGroupBy.aggregate)(
+        return GroupByDefault.register(my_happy_pandas.core.groupby.DataFrameGroupBy.aggregate)(
             self,
             by=by,
             is_multi_by=is_multi_by,
@@ -1427,12 +1427,12 @@ class BaseQueryCompiler(abc.ABC):
     # END Manual Partitioning methods
 
     def unstack(self, level, fill_value):
-        return DataFrameDefault.register(pandas.DataFrame.unstack)(
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.unstack)(
             self, level=level, fill_value=fill_value
         )
 
     def pivot(self, index, columns, values):
-        return DataFrameDefault.register(pandas.DataFrame.pivot)(
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.pivot)(
             self, index=index, columns=columns, values=values
         )
 
@@ -1448,7 +1448,7 @@ class BaseQueryCompiler(abc.ABC):
         margins_name,
         observed,
     ):
-        return DataFrameDefault.register(pandas.DataFrame.pivot_table)(
+        return DataFrameDefault.register(my_happy_pandas.DataFrame.pivot_table)(
             self,
             index=index,
             values=values,
@@ -1472,7 +1472,7 @@ class BaseQueryCompiler(abc.ABC):
         """
 
         def get_dummies(df, columns, **kwargs):
-            return pandas.get_dummies(df, columns=columns, **kwargs)
+            return my_happy_pandas.get_dummies(df, columns=columns, **kwargs)
 
         return DataFrameDefault.register(get_dummies)(self, columns=columns, **kwargs)
 
@@ -1495,7 +1495,7 @@ class BaseQueryCompiler(abc.ABC):
         Series
             Newly created Series with repeated elements.
         """
-        return SeriesDefault.register(pandas.Series.repeat)(self, repeats=repeats)
+        return SeriesDefault.register(my_happy_pandas.Series.repeat)(self, repeats=repeats)
 
     # Indexing
 
@@ -1565,7 +1565,7 @@ class BaseQueryCompiler(abc.ABC):
 
     def setitem(self, axis, key, value):
         def setitem(df, axis, key, value):
-            if is_scalar(key) and isinstance(value, pandas.DataFrame):
+            if is_scalar(key) and isinstance(value, my_happy_pandas.DataFrame):
                 value = value.squeeze()
             if not axis:
                 df[key] = value
@@ -1577,7 +1577,7 @@ class BaseQueryCompiler(abc.ABC):
 
     def write_items(self, row_numeric_index, col_numeric_index, broadcasted_items):
         def write_items(df, broadcasted_items):
-            if isinstance(df.iloc[row_numeric_index, col_numeric_index], pandas.Series):
+            if isinstance(df.iloc[row_numeric_index, col_numeric_index], my_happy_pandas.Series):
                 broadcasted_items = broadcasted_items.squeeze()
             df.iloc[
                 list(row_numeric_index), list(col_numeric_index)
@@ -1617,9 +1617,9 @@ class BaseQueryCompiler(abc.ABC):
             True if index at specified axis is MultiIndex and False otherwise.
         """
         if axis == 0:
-            return isinstance(self.index, pandas.MultiIndex)
+            return isinstance(self.index, my_happy_pandas.MultiIndex)
         assert axis == 1
-        return isinstance(self.columns, pandas.MultiIndex)
+        return isinstance(self.columns, my_happy_pandas.MultiIndex)
 
     def get_index_name(self, axis=0):
         """
@@ -1681,208 +1681,208 @@ class BaseQueryCompiler(abc.ABC):
 
     # DateTime methods
 
-    dt_ceil = DateTimeDefault.register(pandas.Series.dt.ceil)
-    dt_components = DateTimeDefault.register(pandas.Series.dt.components)
-    dt_date = DateTimeDefault.register(pandas.Series.dt.date)
-    dt_day = DateTimeDefault.register(pandas.Series.dt.day)
-    dt_day_name = DateTimeDefault.register(pandas.Series.dt.day_name)
-    dt_dayofweek = DateTimeDefault.register(pandas.Series.dt.dayofweek)
-    dt_dayofyear = DateTimeDefault.register(pandas.Series.dt.dayofyear)
-    dt_days = DateTimeDefault.register(pandas.Series.dt.days)
-    dt_days_in_month = DateTimeDefault.register(pandas.Series.dt.days_in_month)
-    dt_daysinmonth = DateTimeDefault.register(pandas.Series.dt.daysinmonth)
-    dt_end_time = DateTimeDefault.register(pandas.Series.dt.end_time)
-    dt_floor = DateTimeDefault.register(pandas.Series.dt.floor)
-    dt_freq = DateTimeDefault.register(pandas.Series.dt.freq)
-    dt_hour = DateTimeDefault.register(pandas.Series.dt.hour)
-    dt_is_leap_year = DateTimeDefault.register(pandas.Series.dt.is_leap_year)
-    dt_is_month_end = DateTimeDefault.register(pandas.Series.dt.is_month_end)
-    dt_is_month_start = DateTimeDefault.register(pandas.Series.dt.is_month_start)
-    dt_is_quarter_end = DateTimeDefault.register(pandas.Series.dt.is_quarter_end)
-    dt_is_quarter_start = DateTimeDefault.register(pandas.Series.dt.is_quarter_start)
-    dt_is_year_end = DateTimeDefault.register(pandas.Series.dt.is_year_end)
-    dt_is_year_start = DateTimeDefault.register(pandas.Series.dt.is_year_start)
-    dt_microsecond = DateTimeDefault.register(pandas.Series.dt.microsecond)
-    dt_microseconds = DateTimeDefault.register(pandas.Series.dt.microseconds)
-    dt_minute = DateTimeDefault.register(pandas.Series.dt.minute)
-    dt_month = DateTimeDefault.register(pandas.Series.dt.month)
-    dt_month_name = DateTimeDefault.register(pandas.Series.dt.month_name)
-    dt_nanosecond = DateTimeDefault.register(pandas.Series.dt.nanosecond)
-    dt_nanoseconds = DateTimeDefault.register(pandas.Series.dt.nanoseconds)
-    dt_normalize = DateTimeDefault.register(pandas.Series.dt.normalize)
-    dt_quarter = DateTimeDefault.register(pandas.Series.dt.quarter)
-    dt_qyear = DateTimeDefault.register(pandas.Series.dt.qyear)
-    dt_round = DateTimeDefault.register(pandas.Series.dt.round)
-    dt_second = DateTimeDefault.register(pandas.Series.dt.second)
-    dt_seconds = DateTimeDefault.register(pandas.Series.dt.seconds)
-    dt_start_time = DateTimeDefault.register(pandas.Series.dt.start_time)
-    dt_strftime = DateTimeDefault.register(pandas.Series.dt.strftime)
-    dt_time = DateTimeDefault.register(pandas.Series.dt.time)
-    dt_timetz = DateTimeDefault.register(pandas.Series.dt.timetz)
-    dt_to_period = DateTimeDefault.register(pandas.Series.dt.to_period)
-    dt_to_pydatetime = DateTimeDefault.register(pandas.Series.dt.to_pydatetime)
-    dt_to_pytimedelta = DateTimeDefault.register(pandas.Series.dt.to_pytimedelta)
-    dt_to_timestamp = DateTimeDefault.register(pandas.Series.dt.to_timestamp)
-    dt_total_seconds = DateTimeDefault.register(pandas.Series.dt.total_seconds)
-    dt_tz = DateTimeDefault.register(pandas.Series.dt.tz)
-    dt_tz_convert = DateTimeDefault.register(pandas.Series.dt.tz_convert)
-    dt_tz_localize = DateTimeDefault.register(pandas.Series.dt.tz_localize)
-    dt_week = DateTimeDefault.register(pandas.Series.dt.week)
-    dt_weekday = DateTimeDefault.register(pandas.Series.dt.weekday)
-    dt_weekofyear = DateTimeDefault.register(pandas.Series.dt.weekofyear)
-    dt_year = DateTimeDefault.register(pandas.Series.dt.year)
+    dt_ceil = DateTimeDefault.register(my_happy_pandas.Series.dt.ceil)
+    dt_components = DateTimeDefault.register(my_happy_pandas.Series.dt.components)
+    dt_date = DateTimeDefault.register(my_happy_pandas.Series.dt.date)
+    dt_day = DateTimeDefault.register(my_happy_pandas.Series.dt.day)
+    dt_day_name = DateTimeDefault.register(my_happy_pandas.Series.dt.day_name)
+    dt_dayofweek = DateTimeDefault.register(my_happy_pandas.Series.dt.dayofweek)
+    dt_dayofyear = DateTimeDefault.register(my_happy_pandas.Series.dt.dayofyear)
+    dt_days = DateTimeDefault.register(my_happy_pandas.Series.dt.days)
+    dt_days_in_month = DateTimeDefault.register(my_happy_pandas.Series.dt.days_in_month)
+    dt_daysinmonth = DateTimeDefault.register(my_happy_pandas.Series.dt.daysinmonth)
+    dt_end_time = DateTimeDefault.register(my_happy_pandas.Series.dt.end_time)
+    dt_floor = DateTimeDefault.register(my_happy_pandas.Series.dt.floor)
+    dt_freq = DateTimeDefault.register(my_happy_pandas.Series.dt.freq)
+    dt_hour = DateTimeDefault.register(my_happy_pandas.Series.dt.hour)
+    dt_is_leap_year = DateTimeDefault.register(my_happy_pandas.Series.dt.is_leap_year)
+    dt_is_month_end = DateTimeDefault.register(my_happy_pandas.Series.dt.is_month_end)
+    dt_is_month_start = DateTimeDefault.register(my_happy_pandas.Series.dt.is_month_start)
+    dt_is_quarter_end = DateTimeDefault.register(my_happy_pandas.Series.dt.is_quarter_end)
+    dt_is_quarter_start = DateTimeDefault.register(my_happy_pandas.Series.dt.is_quarter_start)
+    dt_is_year_end = DateTimeDefault.register(my_happy_pandas.Series.dt.is_year_end)
+    dt_is_year_start = DateTimeDefault.register(my_happy_pandas.Series.dt.is_year_start)
+    dt_microsecond = DateTimeDefault.register(my_happy_pandas.Series.dt.microsecond)
+    dt_microseconds = DateTimeDefault.register(my_happy_pandas.Series.dt.microseconds)
+    dt_minute = DateTimeDefault.register(my_happy_pandas.Series.dt.minute)
+    dt_month = DateTimeDefault.register(my_happy_pandas.Series.dt.month)
+    dt_month_name = DateTimeDefault.register(my_happy_pandas.Series.dt.month_name)
+    dt_nanosecond = DateTimeDefault.register(my_happy_pandas.Series.dt.nanosecond)
+    dt_nanoseconds = DateTimeDefault.register(my_happy_pandas.Series.dt.nanoseconds)
+    dt_normalize = DateTimeDefault.register(my_happy_pandas.Series.dt.normalize)
+    dt_quarter = DateTimeDefault.register(my_happy_pandas.Series.dt.quarter)
+    dt_qyear = DateTimeDefault.register(my_happy_pandas.Series.dt.qyear)
+    dt_round = DateTimeDefault.register(my_happy_pandas.Series.dt.round)
+    dt_second = DateTimeDefault.register(my_happy_pandas.Series.dt.second)
+    dt_seconds = DateTimeDefault.register(my_happy_pandas.Series.dt.seconds)
+    dt_start_time = DateTimeDefault.register(my_happy_pandas.Series.dt.start_time)
+    dt_strftime = DateTimeDefault.register(my_happy_pandas.Series.dt.strftime)
+    dt_time = DateTimeDefault.register(my_happy_pandas.Series.dt.time)
+    dt_timetz = DateTimeDefault.register(my_happy_pandas.Series.dt.timetz)
+    dt_to_period = DateTimeDefault.register(my_happy_pandas.Series.dt.to_period)
+    dt_to_pydatetime = DateTimeDefault.register(my_happy_pandas.Series.dt.to_pydatetime)
+    dt_to_pytimedelta = DateTimeDefault.register(my_happy_pandas.Series.dt.to_pytimedelta)
+    dt_to_timestamp = DateTimeDefault.register(my_happy_pandas.Series.dt.to_timestamp)
+    dt_total_seconds = DateTimeDefault.register(my_happy_pandas.Series.dt.total_seconds)
+    dt_tz = DateTimeDefault.register(my_happy_pandas.Series.dt.tz)
+    dt_tz_convert = DateTimeDefault.register(my_happy_pandas.Series.dt.tz_convert)
+    dt_tz_localize = DateTimeDefault.register(my_happy_pandas.Series.dt.tz_localize)
+    dt_week = DateTimeDefault.register(my_happy_pandas.Series.dt.week)
+    dt_weekday = DateTimeDefault.register(my_happy_pandas.Series.dt.weekday)
+    dt_weekofyear = DateTimeDefault.register(my_happy_pandas.Series.dt.weekofyear)
+    dt_year = DateTimeDefault.register(my_happy_pandas.Series.dt.year)
 
     # End of DateTime methods
 
     # Resample methods
 
-    resample_agg_df = ResampleDefault.register(pandas.core.resample.Resampler.aggregate)
+    resample_agg_df = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.aggregate)
     resample_agg_ser = ResampleDefault.register(
-        pandas.core.resample.Resampler.aggregate, squeeze_self=True
+        my_happy_pandas.core.resample.Resampler.aggregate, squeeze_self=True
     )
-    resample_app_df = ResampleDefault.register(pandas.core.resample.Resampler.apply)
+    resample_app_df = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.apply)
     resample_app_ser = ResampleDefault.register(
-        pandas.core.resample.Resampler.apply, squeeze_self=True
+        my_happy_pandas.core.resample.Resampler.apply, squeeze_self=True
     )
-    resample_asfreq = ResampleDefault.register(pandas.core.resample.Resampler.asfreq)
+    resample_asfreq = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.asfreq)
     resample_backfill = ResampleDefault.register(
-        pandas.core.resample.Resampler.backfill
+        my_happy_pandas.core.resample.Resampler.backfill
     )
-    resample_bfill = ResampleDefault.register(pandas.core.resample.Resampler.bfill)
-    resample_count = ResampleDefault.register(pandas.core.resample.Resampler.count)
-    resample_ffill = ResampleDefault.register(pandas.core.resample.Resampler.ffill)
-    resample_fillna = ResampleDefault.register(pandas.core.resample.Resampler.fillna)
-    resample_first = ResampleDefault.register(pandas.core.resample.Resampler.first)
+    resample_bfill = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.bfill)
+    resample_count = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.count)
+    resample_ffill = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.ffill)
+    resample_fillna = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.fillna)
+    resample_first = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.first)
     resample_get_group = ResampleDefault.register(
-        pandas.core.resample.Resampler.get_group
+        my_happy_pandas.core.resample.Resampler.get_group
     )
     resample_interpolate = ResampleDefault.register(
-        pandas.core.resample.Resampler.interpolate
+        my_happy_pandas.core.resample.Resampler.interpolate
     )
-    resample_last = ResampleDefault.register(pandas.core.resample.Resampler.last)
-    resample_max = ResampleDefault.register(pandas.core.resample.Resampler.max)
-    resample_mean = ResampleDefault.register(pandas.core.resample.Resampler.mean)
-    resample_median = ResampleDefault.register(pandas.core.resample.Resampler.median)
-    resample_min = ResampleDefault.register(pandas.core.resample.Resampler.min)
-    resample_nearest = ResampleDefault.register(pandas.core.resample.Resampler.nearest)
-    resample_nunique = ResampleDefault.register(pandas.core.resample.Resampler.nunique)
-    resample_ohlc_df = ResampleDefault.register(pandas.core.resample.Resampler.ohlc)
+    resample_last = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.last)
+    resample_max = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.max)
+    resample_mean = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.mean)
+    resample_median = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.median)
+    resample_min = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.min)
+    resample_nearest = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.nearest)
+    resample_nunique = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.nunique)
+    resample_ohlc_df = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.ohlc)
     resample_ohlc_ser = ResampleDefault.register(
-        pandas.core.resample.Resampler.ohlc, squeeze_self=True
+        my_happy_pandas.core.resample.Resampler.ohlc, squeeze_self=True
     )
-    resample_pad = ResampleDefault.register(pandas.core.resample.Resampler.pad)
-    resample_pipe = ResampleDefault.register(pandas.core.resample.Resampler.pipe)
-    resample_prod = ResampleDefault.register(pandas.core.resample.Resampler.prod)
+    resample_pad = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.pad)
+    resample_pipe = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.pipe)
+    resample_prod = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.prod)
     resample_quantile = ResampleDefault.register(
-        pandas.core.resample.Resampler.quantile
+        my_happy_pandas.core.resample.Resampler.quantile
     )
-    resample_sem = ResampleDefault.register(pandas.core.resample.Resampler.sem)
-    resample_size = ResampleDefault.register(pandas.core.resample.Resampler.size)
-    resample_std = ResampleDefault.register(pandas.core.resample.Resampler.std)
-    resample_sum = ResampleDefault.register(pandas.core.resample.Resampler.sum)
+    resample_sem = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.sem)
+    resample_size = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.size)
+    resample_std = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.std)
+    resample_sum = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.sum)
     resample_transform = ResampleDefault.register(
-        pandas.core.resample.Resampler.transform
+        my_happy_pandas.core.resample.Resampler.transform
     )
-    resample_var = ResampleDefault.register(pandas.core.resample.Resampler.var)
+    resample_var = ResampleDefault.register(my_happy_pandas.core.resample.Resampler.var)
 
     # End of Resample methods
 
     # Str methods
 
-    str_capitalize = StrDefault.register(pandas.Series.str.capitalize)
-    str_center = StrDefault.register(pandas.Series.str.center)
-    str_contains = StrDefault.register(pandas.Series.str.contains)
-    str_count = StrDefault.register(pandas.Series.str.count)
-    str_endswith = StrDefault.register(pandas.Series.str.endswith)
-    str_find = StrDefault.register(pandas.Series.str.find)
-    str_findall = StrDefault.register(pandas.Series.str.findall)
-    str_get = StrDefault.register(pandas.Series.str.get)
-    str_index = StrDefault.register(pandas.Series.str.index)
-    str_isalnum = StrDefault.register(pandas.Series.str.isalnum)
-    str_isalpha = StrDefault.register(pandas.Series.str.isalpha)
-    str_isdecimal = StrDefault.register(pandas.Series.str.isdecimal)
-    str_isdigit = StrDefault.register(pandas.Series.str.isdigit)
-    str_islower = StrDefault.register(pandas.Series.str.islower)
-    str_isnumeric = StrDefault.register(pandas.Series.str.isnumeric)
-    str_isspace = StrDefault.register(pandas.Series.str.isspace)
-    str_istitle = StrDefault.register(pandas.Series.str.istitle)
-    str_isupper = StrDefault.register(pandas.Series.str.isupper)
-    str_join = StrDefault.register(pandas.Series.str.join)
-    str_len = StrDefault.register(pandas.Series.str.len)
-    str_ljust = StrDefault.register(pandas.Series.str.ljust)
-    str_lower = StrDefault.register(pandas.Series.str.lower)
-    str_lstrip = StrDefault.register(pandas.Series.str.lstrip)
-    str_match = StrDefault.register(pandas.Series.str.match)
-    str_normalize = StrDefault.register(pandas.Series.str.normalize)
-    str_pad = StrDefault.register(pandas.Series.str.pad)
-    str_partition = StrDefault.register(pandas.Series.str.partition)
-    str_repeat = StrDefault.register(pandas.Series.str.repeat)
-    str_replace = StrDefault.register(pandas.Series.str.replace)
-    str_rfind = StrDefault.register(pandas.Series.str.rfind)
-    str_rindex = StrDefault.register(pandas.Series.str.rindex)
-    str_rjust = StrDefault.register(pandas.Series.str.rjust)
-    str_rpartition = StrDefault.register(pandas.Series.str.rpartition)
-    str_rsplit = StrDefault.register(pandas.Series.str.rsplit)
-    str_rstrip = StrDefault.register(pandas.Series.str.rstrip)
-    str_slice = StrDefault.register(pandas.Series.str.slice)
-    str_slice_replace = StrDefault.register(pandas.Series.str.slice_replace)
-    str_split = StrDefault.register(pandas.Series.str.split)
-    str_startswith = StrDefault.register(pandas.Series.str.startswith)
-    str_strip = StrDefault.register(pandas.Series.str.strip)
-    str_swapcase = StrDefault.register(pandas.Series.str.swapcase)
-    str_title = StrDefault.register(pandas.Series.str.title)
-    str_translate = StrDefault.register(pandas.Series.str.translate)
-    str_upper = StrDefault.register(pandas.Series.str.upper)
-    str_wrap = StrDefault.register(pandas.Series.str.wrap)
-    str_zfill = StrDefault.register(pandas.Series.str.zfill)
+    str_capitalize = StrDefault.register(my_happy_pandas.Series.str.capitalize)
+    str_center = StrDefault.register(my_happy_pandas.Series.str.center)
+    str_contains = StrDefault.register(my_happy_pandas.Series.str.contains)
+    str_count = StrDefault.register(my_happy_pandas.Series.str.count)
+    str_endswith = StrDefault.register(my_happy_pandas.Series.str.endswith)
+    str_find = StrDefault.register(my_happy_pandas.Series.str.find)
+    str_findall = StrDefault.register(my_happy_pandas.Series.str.findall)
+    str_get = StrDefault.register(my_happy_pandas.Series.str.get)
+    str_index = StrDefault.register(my_happy_pandas.Series.str.index)
+    str_isalnum = StrDefault.register(my_happy_pandas.Series.str.isalnum)
+    str_isalpha = StrDefault.register(my_happy_pandas.Series.str.isalpha)
+    str_isdecimal = StrDefault.register(my_happy_pandas.Series.str.isdecimal)
+    str_isdigit = StrDefault.register(my_happy_pandas.Series.str.isdigit)
+    str_islower = StrDefault.register(my_happy_pandas.Series.str.islower)
+    str_isnumeric = StrDefault.register(my_happy_pandas.Series.str.isnumeric)
+    str_isspace = StrDefault.register(my_happy_pandas.Series.str.isspace)
+    str_istitle = StrDefault.register(my_happy_pandas.Series.str.istitle)
+    str_isupper = StrDefault.register(my_happy_pandas.Series.str.isupper)
+    str_join = StrDefault.register(my_happy_pandas.Series.str.join)
+    str_len = StrDefault.register(my_happy_pandas.Series.str.len)
+    str_ljust = StrDefault.register(my_happy_pandas.Series.str.ljust)
+    str_lower = StrDefault.register(my_happy_pandas.Series.str.lower)
+    str_lstrip = StrDefault.register(my_happy_pandas.Series.str.lstrip)
+    str_match = StrDefault.register(my_happy_pandas.Series.str.match)
+    str_normalize = StrDefault.register(my_happy_pandas.Series.str.normalize)
+    str_pad = StrDefault.register(my_happy_pandas.Series.str.pad)
+    str_partition = StrDefault.register(my_happy_pandas.Series.str.partition)
+    str_repeat = StrDefault.register(my_happy_pandas.Series.str.repeat)
+    str_replace = StrDefault.register(my_happy_pandas.Series.str.replace)
+    str_rfind = StrDefault.register(my_happy_pandas.Series.str.rfind)
+    str_rindex = StrDefault.register(my_happy_pandas.Series.str.rindex)
+    str_rjust = StrDefault.register(my_happy_pandas.Series.str.rjust)
+    str_rpartition = StrDefault.register(my_happy_pandas.Series.str.rpartition)
+    str_rsplit = StrDefault.register(my_happy_pandas.Series.str.rsplit)
+    str_rstrip = StrDefault.register(my_happy_pandas.Series.str.rstrip)
+    str_slice = StrDefault.register(my_happy_pandas.Series.str.slice)
+    str_slice_replace = StrDefault.register(my_happy_pandas.Series.str.slice_replace)
+    str_split = StrDefault.register(my_happy_pandas.Series.str.split)
+    str_startswith = StrDefault.register(my_happy_pandas.Series.str.startswith)
+    str_strip = StrDefault.register(my_happy_pandas.Series.str.strip)
+    str_swapcase = StrDefault.register(my_happy_pandas.Series.str.swapcase)
+    str_title = StrDefault.register(my_happy_pandas.Series.str.title)
+    str_translate = StrDefault.register(my_happy_pandas.Series.str.translate)
+    str_upper = StrDefault.register(my_happy_pandas.Series.str.upper)
+    str_wrap = StrDefault.register(my_happy_pandas.Series.str.wrap)
+    str_zfill = StrDefault.register(my_happy_pandas.Series.str.zfill)
 
     # End of Str methods
 
     # Rolling methods
 
     rolling_aggregate = RollingDefault.register(
-        pandas.core.window.rolling.Rolling.aggregate
+        my_happy_pandas.core.window.rolling.Rolling.aggregate
     )
-    rolling_apply = RollingDefault.register(pandas.core.window.rolling.Rolling.apply)
-    rolling_corr = RollingDefault.register(pandas.core.window.rolling.Rolling.corr)
-    rolling_count = RollingDefault.register(pandas.core.window.rolling.Rolling.count)
-    rolling_cov = RollingDefault.register(pandas.core.window.rolling.Rolling.cov)
-    rolling_kurt = RollingDefault.register(pandas.core.window.rolling.Rolling.kurt)
-    rolling_max = RollingDefault.register(pandas.core.window.rolling.Rolling.max)
-    rolling_mean = RollingDefault.register(pandas.core.window.rolling.Rolling.mean)
-    rolling_median = RollingDefault.register(pandas.core.window.rolling.Rolling.median)
-    rolling_min = RollingDefault.register(pandas.core.window.rolling.Rolling.min)
+    rolling_apply = RollingDefault.register(my_happy_pandas.core.window.rolling.Rolling.apply)
+    rolling_corr = RollingDefault.register(my_happy_pandas.core.window.rolling.Rolling.corr)
+    rolling_count = RollingDefault.register(my_happy_pandas.core.window.rolling.Rolling.count)
+    rolling_cov = RollingDefault.register(my_happy_pandas.core.window.rolling.Rolling.cov)
+    rolling_kurt = RollingDefault.register(my_happy_pandas.core.window.rolling.Rolling.kurt)
+    rolling_max = RollingDefault.register(my_happy_pandas.core.window.rolling.Rolling.max)
+    rolling_mean = RollingDefault.register(my_happy_pandas.core.window.rolling.Rolling.mean)
+    rolling_median = RollingDefault.register(my_happy_pandas.core.window.rolling.Rolling.median)
+    rolling_min = RollingDefault.register(my_happy_pandas.core.window.rolling.Rolling.min)
     rolling_quantile = RollingDefault.register(
-        pandas.core.window.rolling.Rolling.quantile
+        my_happy_pandas.core.window.rolling.Rolling.quantile
     )
-    rolling_skew = RollingDefault.register(pandas.core.window.rolling.Rolling.skew)
-    rolling_std = RollingDefault.register(pandas.core.window.rolling.Rolling.std)
-    rolling_sum = RollingDefault.register(pandas.core.window.rolling.Rolling.sum)
-    rolling_var = RollingDefault.register(pandas.core.window.rolling.Rolling.var)
+    rolling_skew = RollingDefault.register(my_happy_pandas.core.window.rolling.Rolling.skew)
+    rolling_std = RollingDefault.register(my_happy_pandas.core.window.rolling.Rolling.std)
+    rolling_sum = RollingDefault.register(my_happy_pandas.core.window.rolling.Rolling.sum)
+    rolling_var = RollingDefault.register(my_happy_pandas.core.window.rolling.Rolling.var)
 
     # End of Rolling methods
 
     # Window methods
 
-    window_mean = RollingDefault.register(pandas.core.window.Window.mean)
-    window_std = RollingDefault.register(pandas.core.window.Window.std)
-    window_sum = RollingDefault.register(pandas.core.window.Window.sum)
-    window_var = RollingDefault.register(pandas.core.window.Window.var)
+    window_mean = RollingDefault.register(my_happy_pandas.core.window.Window.mean)
+    window_std = RollingDefault.register(my_happy_pandas.core.window.Window.std)
+    window_sum = RollingDefault.register(my_happy_pandas.core.window.Window.sum)
+    window_var = RollingDefault.register(my_happy_pandas.core.window.Window.var)
 
     # End of Window methods
 
     # Categories methods
 
-    cat_codes = CatDefault.register(pandas.Series.cat.codes)
+    cat_codes = CatDefault.register(my_happy_pandas.Series.cat.codes)
 
     # End of Categories methods
 
     # DataFrame methods
 
-    invert = DataFrameDefault.register(pandas.DataFrame.__invert__)
-    mad = DataFrameDefault.register(pandas.DataFrame.mad)
-    kurt = DataFrameDefault.register(pandas.DataFrame.kurt)
-    sum_min_count = DataFrameDefault.register(pandas.DataFrame.sum)
-    prod_min_count = DataFrameDefault.register(pandas.DataFrame.prod)
+    invert = DataFrameDefault.register(my_happy_pandas.DataFrame.__invert__)
+    mad = DataFrameDefault.register(my_happy_pandas.DataFrame.mad)
+    kurt = DataFrameDefault.register(my_happy_pandas.DataFrame.kurt)
+    sum_min_count = DataFrameDefault.register(my_happy_pandas.DataFrame.sum)
+    prod_min_count = DataFrameDefault.register(my_happy_pandas.DataFrame.prod)
 
     # End of DataFrame methods

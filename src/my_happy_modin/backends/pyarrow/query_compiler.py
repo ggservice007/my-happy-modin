@@ -12,10 +12,10 @@
 # governing permissions and limitations under the License.
 
 from my_happy_modin.backends.pandas.query_compiler import PandasQueryCompiler
-import pandas
-from pandas.core.computation.expr import Expr
-from pandas.core.computation.scope import Scope
-from pandas.core.computation.ops import UnaryOp, BinOp, Term, MathCall, Constant
+import my_happy_pandas
+from my_happy_pandas.core.computation.expr import Expr
+from my_happy_pandas.core.computation.scope import Scope
+from my_happy_pandas.core.computation.ops import UnaryOp, BinOp, Term, MathCall, Constant
 
 import pyarrow as pa
 import pyarrow.gandiva as gandiva
@@ -166,10 +166,10 @@ class PyarrowQueryCompiler(PandasQueryCompiler):
     def _compute_index(self, axis, data_object, compute_diff=True):
         def arrow_index_extraction(table, axis):
             if not axis:
-                return pandas.Index(table.column(table.num_columns - 1))
+                return my_happy_pandas.Index(table.column(table.num_columns - 1))
             else:
                 try:
-                    return pandas.Index(table.columns)
+                    return my_happy_pandas.Index(table.columns)
                 except AttributeError:
                     return []
 

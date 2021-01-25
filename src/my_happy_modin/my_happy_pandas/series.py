@@ -23,15 +23,15 @@ Manually add documentation for methods which are not presented in pandas.
 """
 
 import numpy as np
-import pandas
-from pandas.core.common import apply_if_callable, is_bool_indexer
-from pandas.util._validators import validate_bool_kwarg
-from pandas.core.dtypes.common import (
+import my_happy_pandas
+from my_happy_pandas.core.common import apply_if_callable, is_bool_indexer
+from my_happy_pandas.util._validators import validate_bool_kwarg
+from my_happy_pandas.core.dtypes.common import (
     is_dict_like,
     is_list_like,
 )
-from pandas._libs.lib import no_default
-from pandas._typing import IndexKeyFunc
+from my_happy_pandas._libs.lib import no_default
+from my_happy_pandas._typing import IndexKeyFunc
 import sys
 from typing import Union, Optional
 import warnings
@@ -44,7 +44,7 @@ from .utils import from_pandas, is_scalar
 from .accessor import CachedAccessor, SparseAccessor
 
 
-@_inherit_docstrings(pandas.Series, excluded=[pandas.Series.__init__])
+@_inherit_docstrings(my_happy_pandas.Series, excluded=[my_happy_pandas.Series.__init__])
 class Series(BasePandasDataset):
     def __init__(
         self,
@@ -93,12 +93,12 @@ class Series(BasePandasDataset):
             )
             if name is None:
                 name = "__reduced__"
-                if isinstance(data, pandas.Series) and data.name is not None:
+                if isinstance(data, my_happy_pandas.Series) and data.name is not None:
                     name = data.name
 
             query_compiler = from_pandas(
-                pandas.DataFrame(
-                    pandas.Series(
+                my_happy_pandas.DataFrame(
+                    my_happy_pandas.Series(
                         data=data,
                         index=index,
                         dtype=dtype,
@@ -151,7 +151,7 @@ class Series(BasePandasDataset):
         return self._to_pandas().__array_priority__
 
     def __bytes__(self):
-        return self._default_to_pandas(pandas.Series.__bytes__)
+        return self._default_to_pandas(my_happy_pandas.Series.__bytes__)
 
     def __contains__(self, key):
         return key in self.index
@@ -225,15 +225,15 @@ class Series(BasePandasDataset):
         return self.rpow(left)
 
     def __repr__(self):
-        num_rows = pandas.get_option("max_rows") or 60
-        num_cols = pandas.get_option("max_columns") or 20
+        num_rows = my_happy_pandas.get_option("max_rows") or 60
+        num_cols = my_happy_pandas.get_option("max_columns") or 20
         temp_df = self._build_repr_df(num_rows, num_cols)
-        if isinstance(temp_df, pandas.DataFrame) and not temp_df.empty:
+        if isinstance(temp_df, my_happy_pandas.DataFrame) and not temp_df.empty:
             temp_df = temp_df.iloc[:, 0]
         temp_str = repr(temp_df)
         freq_str = (
             "Freq: {}, ".format(self.index.freqstr)
-            if isinstance(self.index, pandas.DatetimeIndex)
+            if isinstance(self.index, my_happy_pandas.DatetimeIndex)
             else ""
         )
         if self.name is not None:
@@ -396,14 +396,14 @@ class Series(BasePandasDataset):
         # the return type.
         try:
             return_type = type(
-                getattr(pandas.Series("", index=self.index[:1]), apply_func)(
+                getattr(my_happy_pandas.Series("", index=self.index[:1]), apply_func)(
                     func, *args, **kwds
                 )
             ).__name__
         except Exception:
             try:
                 return_type = type(
-                    getattr(pandas.Series(0, index=self.index[:1]), apply_func)(
+                    getattr(my_happy_pandas.Series(0, index=self.index[:1]), apply_func)(
                         func, *args, **kwds
                     )
                 ).__name__
@@ -445,19 +445,19 @@ class Series(BasePandasDataset):
 
     def argmax(self, axis=None, skipna=True, *args, **kwargs):
         result = self.idxmax(axis=axis, skipna=skipna, *args, **kwargs)
-        if np.isnan(result) or result is pandas.NA:
+        if np.isnan(result) or result is my_happy_pandas.NA:
             result = -1
         return result
 
     def argmin(self, axis=None, skipna=True, *args, **kwargs):
         result = self.idxmin(axis=axis, skipna=skipna, *args, **kwargs)
-        if np.isnan(result) or result is pandas.NA:
+        if np.isnan(result) or result is my_happy_pandas.NA:
             result = -1
         return result
 
     def argsort(self, axis=0, kind="quicksort", order=None):
         return self._default_to_pandas(
-            pandas.Series.argsort, axis=axis, kind=kind, order=order
+            my_happy_pandas.Series.argsort, axis=axis, kind=kind, order=order
         )
 
     def autocorr(self, lag=1):
@@ -465,7 +465,7 @@ class Series(BasePandasDataset):
 
     def between(self, left, right, inclusive=True):
         return self._default_to_pandas(
-            pandas.Series.between, left, right, inclusive=inclusive
+            my_happy_pandas.Series.between, left, right, inclusive=inclusive
         )
 
     def combine(self, other, func, fill_value=None):
@@ -481,7 +481,7 @@ class Series(BasePandasDataset):
         keep_equal: bool = False,
     ):
         return self._default_to_pandas(
-            pandas.Series.compare,
+            my_happy_pandas.Series.compare,
             other=other,
             align_axis=align_axis,
             keep_shape=keep_shape,
@@ -533,7 +533,7 @@ class Series(BasePandasDataset):
 
         return self.__constructor__(
             query_compiler=self._query_compiler.default_to_pandas(
-                pandas.Series.corr,
+                my_happy_pandas.Series.corr,
                 other._query_compiler,
                 method=method,
                 min_periods=min_periods,
@@ -588,7 +588,7 @@ class Series(BasePandasDataset):
 
     def divmod(self, other, level=None, fill_value=None, axis=0):
         return self._default_to_pandas(
-            pandas.Series.divmod, other, level=level, fill_value=fill_value, axis=axis
+            my_happy_pandas.Series.divmod, other, level=level, fill_value=fill_value, axis=axis
         )
 
     def dot(self, other):
@@ -647,11 +647,11 @@ class Series(BasePandasDataset):
         )
 
     def explode(self, ignore_index: bool = False):
-        return self._default_to_pandas(pandas.Series.explode, ignore_index=ignore_index)
+        return self._default_to_pandas(my_happy_pandas.Series.explode, ignore_index=ignore_index)
 
     def factorize(self, sort=False, na_sentinel=-1):
         return self._default_to_pandas(
-            pandas.Series.factorize, sort=sort, na_sentinel=na_sentinel
+            my_happy_pandas.Series.factorize, sort=sort, na_sentinel=na_sentinel
         )
 
     def floordiv(self, other, level=None, fill_value=None, axis=0):
@@ -732,7 +732,7 @@ class Series(BasePandasDataset):
         **kwds,
     ):
         return self._default_to_pandas(
-            pandas.Series.hist,
+            my_happy_pandas.Series.hist,
             by=by,
             ax=ax,
             grid=grid,
@@ -767,7 +767,7 @@ class Series(BasePandasDataset):
         **kwargs,
     ):
         return self._default_to_pandas(
-            pandas.Series.interpolate,
+            my_happy_pandas.Series.interpolate,
             method=method,
             axis=axis,
             limit=limit,
@@ -813,7 +813,7 @@ class Series(BasePandasDataset):
         return self.__constructor__(
             query_compiler=self._query_compiler.applymap(
                 lambda s: arg(s)
-                if pandas.isnull(s) is not True or na_action is None
+                if my_happy_pandas.isnull(s) is not True or na_action is None
                 else s
             )
         )
@@ -849,7 +849,7 @@ class Series(BasePandasDataset):
         return super(Series, new_self).ne(new_other, level=level, axis=axis)
 
     def nlargest(self, n=5, keep="first"):
-        return self._default_to_pandas(pandas.Series.nlargest, n=n, keep=keep)
+        return self._default_to_pandas(my_happy_pandas.Series.nlargest, n=n, keep=keep)
 
     def nsmallest(self, n=5, keep="first"):
         return Series(query_compiler=self._query_compiler.nsmallest(n=n, keep=keep))
@@ -976,8 +976,8 @@ class Series(BasePandasDataset):
 
     def ravel(self, order="C"):
         data = self._query_compiler.to_numpy().flatten(order=order)
-        if isinstance(self.dtype, pandas.CategoricalDtype):
-            data = pandas.Categorical(data, dtype=self.dtype)
+        if isinstance(self.dtype, my_happy_pandas.CategoricalDtype):
+            data = my_happy_pandas.Categorical(data, dtype=self.dtype)
 
         return data
 
@@ -1040,7 +1040,7 @@ class Series(BasePandasDataset):
 
     def reset_index(self, level=None, drop=False, name=None, inplace=False):
         if drop and level is None:
-            new_idx = pandas.RangeIndex(len(self.index))
+            new_idx = my_happy_pandas.RangeIndex(len(self.index))
             if inplace:
                 self.index = new_idx
                 self.name = name or self.name
@@ -1062,7 +1062,7 @@ class Series(BasePandasDataset):
 
     def rdivmod(self, other, level=None, fill_value=None, axis=0):
         return self._default_to_pandas(
-            pandas.Series.rdivmod, other, level=level, fill_value=fill_value, axis=axis
+            my_happy_pandas.Series.rdivmod, other, level=level, fill_value=fill_value, axis=axis
         )
 
     def rfloordiv(self, other, level=None, fill_value=None, axis=0):
@@ -1133,12 +1133,12 @@ class Series(BasePandasDataset):
             # searchsorted_qc = self.iloc[sorter].reset_index(drop=True)._query_compiler
             # sorter = None
             return self._default_to_pandas(
-                pandas.Series.searchsorted, value, side=side, sorter=sorter
+                my_happy_pandas.Series.searchsorted, value, side=side, sorter=sorter
             )
         # searchsorted should return item number irrespective of Series index, so
-        # Series.index is always set to pandas.RangeIndex, which can be easily processed
+        # Series.index is always set to my_happy_pandas.RangeIndex, which can be easily processed
         # on the query_compiler level
-        if not isinstance(searchsorted_qc.index, pandas.RangeIndex):
+        if not isinstance(searchsorted_qc.index, my_happy_pandas.RangeIndex):
             searchsorted_qc = searchsorted_qc.reset_index(drop=True)
 
         result = self.__constructor__(
@@ -1193,7 +1193,7 @@ class Series(BasePandasDataset):
     def squeeze(self, axis=None):
         if axis is not None:
             # Validate `axis`
-            pandas.Series._get_axis_number(axis)
+            my_happy_pandas.Series._get_axis_number(axis)
         if len(self.index) == 1:
             return self._reduce_dimension(self._query_compiler)
         else:
@@ -1275,7 +1275,7 @@ class Series(BasePandasDataset):
         return DataFrame(self_cp)
 
     def to_list(self):
-        return self._default_to_pandas(pandas.Series.to_list)
+        return self._default_to_pandas(my_happy_pandas.Series.to_list)
 
     def to_numpy(self, dtype=None, copy=False, na_value=no_default, **kwargs):
         return (
@@ -1309,7 +1309,7 @@ class Series(BasePandasDataset):
         min_rows=None,
     ):
         return self._default_to_pandas(
-            pandas.Series.to_string,
+            my_happy_pandas.Series.to_string,
             buf=buf,
             na_rep=na_rep,
             float_format=float_format,
@@ -1341,7 +1341,7 @@ class Series(BasePandasDataset):
 
     def truncate(self, before=None, after=None, axis=None, copy=True):
         return self._default_to_pandas(
-            pandas.Series.truncate, before=before, after=after, axis=axis, copy=copy
+            my_happy_pandas.Series.truncate, before=before, after=after, axis=axis, copy=copy
         )
 
     def unique(self):
@@ -1386,7 +1386,7 @@ class Series(BasePandasDataset):
         if isinstance(other, Series):
             other = to_pandas(other)
         return self._default_to_pandas(
-            pandas.Series.where,
+            my_happy_pandas.Series.where,
             cond,
             other=other,
             inplace=inplace,
@@ -1674,12 +1674,12 @@ class Series(BasePandasDataset):
         if is_bool_indexer(key):
             return self.__constructor__(
                 query_compiler=self._query_compiler.getitem_row_array(
-                    pandas.RangeIndex(len(self.index))[key]
+                    my_happy_pandas.RangeIndex(len(self.index))[key]
                 )
             )
         # TODO: More efficiently handle `tuple` case for `Series.__getitem__`
         if isinstance(key, tuple):
-            return self._default_to_pandas(pandas.Series.__getitem__, key)
+            return self._default_to_pandas(my_happy_pandas.Series.__getitem__, key)
         else:
             if not is_list_like(key):
                 reduce_dimension = True

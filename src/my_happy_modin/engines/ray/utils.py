@@ -62,11 +62,11 @@ def _move_stdlib_ahead_of_site_packages(*args):
         sys.path.insert(site_packages_path_index, os.path.dirname(site_packages_path))
 
 
-# Register a fix to import pandas on all workers before running tasks.
+# Register a fix to import my_happy_pandas on all workers before running tasks.
 # This prevents a race condition between two threads deserializing functions
-# and trying to import pandas at the same time.
+# and trying to import my_happy_pandas at the same time.
 def _import_pandas(*args):
-    import pandas  # noqa F401
+    import my_happy_pandas  # noqa F401
 
 
 def initialize_ray(

@@ -11,7 +11,7 @@
 # ANY KIND, either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-import pandas
+import my_happy_pandas
 
 from .partition_manager import PandasOnRayFrameManager
 from my_happy_modin.engines.base.frame.data import BasePandasFrame
@@ -31,7 +31,7 @@ class PandasOnRayFrame(BasePandasFrame):
         # the limited data seen by each worker. We use pandas to compute the exact dtype
         # over the whole column for each column.
         dtypes = (
-            pandas.concat(ray.get(list_of_dtypes), axis=1)
+            my_happy_pandas.concat(ray.get(list_of_dtypes), axis=1)
             .apply(lambda row: find_common_type(row.values), axis=1)
             .squeeze(axis=0)
         )

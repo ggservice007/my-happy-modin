@@ -18,9 +18,9 @@ import re
 from my_happy_modin.config import Engine
 from my_happy_modin.engines.base.io import BaseIO
 
-import pandas
+import my_happy_pandas
 
-types_dictionary = {"pandas": {"category": pandas.CategoricalDtype}}
+types_dictionary = {"pandas": {"category": my_happy_pandas.CategoricalDtype}}
 
 
 class FactoryInfo(typing.NamedTuple):
@@ -251,7 +251,7 @@ class ExperimentalRemoteFactory(ExperimentalBaseFactory):
         from my_happy_modin.experimental.cloud import get_connection
 
         # import a numpy overrider if it wasn't already imported
-        import my_happy_modin.experimental.pandas.numpy_wrap  # noqa: F401
+        import my_happy_modin.experimental.my_happy_pandas.numpy_wrap  # noqa: F401
 
         class WrappedIO:
             def __init__(self, conn, factory):

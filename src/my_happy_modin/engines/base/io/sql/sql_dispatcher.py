@@ -13,7 +13,7 @@
 
 import math
 import numpy as np
-import pandas
+import my_happy_pandas
 import warnings
 
 from my_happy_modin.engines.base.io.file_dispatcher import FileDispatcher
@@ -30,7 +30,7 @@ class SQLDispatcher(FileDispatcher):
             con: SQLAlchemy connectable (engine/connection) or database string URI or
                 DBAPI2 connection (fallback mode)
             index_col: Column(s) to set as index(MultiIndex).
-            kwargs: Pass into pandas.read_sql function.
+            kwargs: Pass into my_happy_pandas.read_sql function.
         """
         try:
             import psycopg2 as pg
@@ -57,12 +57,12 @@ class SQLDispatcher(FileDispatcher):
             )
             return cls.single_worker_read(sql, con=con, index_col=index_col, **kwargs)
         row_cnt_query = "SELECT COUNT(*) FROM ({}) as foo".format(sql)
-        row_cnt = pandas.read_sql(row_cnt_query, con).squeeze()
-        cols_names_df = pandas.read_sql(
+        row_cnt = my_happy_pandas.read_sql(row_cnt_query, con).squeeze()
+        cols_names_df = my_happy_pandas.read_sql(
             "SELECT * FROM ({}) as foo LIMIT 0".format(sql), con, index_col=index_col
         )
         cols_names = cols_names_df.columns
-        from my_happy_modin.pandas import DEFAULT_NPARTITIONS
+        from my_happy_modin.my_happy_pandas import DEFAULT_NPARTITIONS
 
         num_partitions = DEFAULT_NPARTITIONS
         partition_ids = []
@@ -92,12 +92,12 @@ class SQLDispatcher(FileDispatcher):
             dtype_ids.append(partition_ids[-1])
         if index_col is None:  # sum all lens returned from partitions
             index_lens = cls.materialize(index_ids)
-            new_index = pandas.RangeIndex(sum(index_lens))
+            new_index = my_happy_pandas.RangeIndex(sum(index_lens))
         else:  # concat index returned from partitions
             index_lst = [
                 x for part_index in cls.materialize(index_ids) for x in part_index
             ]
-            new_index = pandas.Index(index_lst).set_names(index_col)
+            new_index = my_happy_pandas.Index(index_lst).set_names(index_col)
         new_frame = cls.frame_cls(np.array(partition_ids), new_index, cols_names)
         new_frame._apply_index_objs(axis=0)
         return cls.query_compiler_cls(new_frame)

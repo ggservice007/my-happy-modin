@@ -14,10 +14,10 @@
 from collections import OrderedDict
 from io import BytesIO
 import numpy as np
-import pandas
-from pandas.core.dtypes.cast import find_common_type
-from pandas.core.dtypes.concat import union_categoricals
-from pandas.io.common import infer_compression
+import my_happy_pandas
+from my_happy_pandas.core.dtypes.cast import find_common_type
+from my_happy_pandas.core.dtypes.concat import union_categoricals
+from my_happy_pandas.io.common import infer_compression
 import warnings
 
 from my_happy_modin.engines.base.io import FileDispatcher
@@ -43,14 +43,14 @@ def _split_result_for_readers(axis, num_splits, df):  # pragma: no cover
 
 
 def find_common_type_cat(types):
-    if all(isinstance(t, pandas.CategoricalDtype) for t in types):
+    if all(isinstance(t, my_happy_pandas.CategoricalDtype) for t in types):
         if all(t.ordered for t in types):
-            return pandas.CategoricalDtype(
+            return my_happy_pandas.CategoricalDtype(
                 np.sort(np.unique([c for t in types for c in t.categories])[0]),
                 ordered=True,
             )
         return union_categoricals(
-            [pandas.Categorical([], dtype=t) for t in types],
+            [my_happy_pandas.Categorical([], dtype=t) for t in types],
             sort_categories=all(t.ordered for t in types),
         ).dtype
     else:
@@ -61,7 +61,7 @@ class PandasParser(object):
     @classmethod
     def get_dtypes(cls, dtypes_ids):
         return (
-            pandas.concat(cls.materialize(dtypes_ids), axis=1)
+            my_happy_pandas.concat(cls.materialize(dtypes_ids), axis=1)
             .apply(lambda row: find_common_type_cat(row.values), axis=1)
             .squeeze(axis=0)
         )
@@ -71,7 +71,7 @@ class PandasParser(object):
         ErrorMessage.default_to_pandas("Parameters provided")
         # Use default args for everything
         pandas_frame = cls.parse(fname, **kwargs)
-        if isinstance(pandas_frame, pandas.io.parsers.TextFileReader):
+        if isinstance(pandas_frame, my_happy_pandas.io.parsers.TextFileReader):
             pd_read = pandas_frame.read
             pandas_frame.read = (
                 lambda *args, **kwargs: cls.query_compiler_cls.from_pandas(
@@ -109,10 +109,10 @@ class PandasCSVParser(PandasParser):
             bio.seek(start)
             to_read = header + bio.read(end - start)
             bio.close()
-            pandas_df = pandas.read_csv(BytesIO(to_read), **kwargs)
+            pandas_df = my_happy_pandas.read_csv(BytesIO(to_read), **kwargs)
         else:
             # This only happens when we are reading with only one worker (Default)
-            return pandas.read_csv(fname, **kwargs)
+            return my_happy_pandas.read_csv(fname, **kwargs)
         if index_col is not None:
             index = pandas_df.index
         else:
@@ -143,10 +143,10 @@ class PandasFWFParser(PandasParser):
             bio.seek(start)
             to_read = header + bio.read(end - start)
             bio.close()
-            pandas_df = pandas.read_fwf(BytesIO(to_read), **kwargs)
+            pandas_df = my_happy_pandas.read_fwf(BytesIO(to_read), **kwargs)
         else:
             # This only happens when we are reading with only one worker (Default)
-            return pandas.read_fwf(fname, **kwargs)
+            return my_happy_pandas.read_fwf(fname, **kwargs)
         if index_col is not None:
             index = pandas_df.index
         else:
@@ -198,19 +198,19 @@ class PandasExcelParser(PandasParser):
 
         # Default to pandas case, where we are not splitting or partitioning
         if start is None or end is None:
-            return pandas.read_excel(fname, **kwargs)
+            return my_happy_pandas.read_excel(fname, **kwargs)
 
         from zipfile import ZipFile
         from openpyxl import load_workbook
         from openpyxl.worksheet._reader import WorksheetReader
         from openpyxl.reader.excel import ExcelReader
         from openpyxl.worksheet.worksheet import Worksheet
-        from pandas.core.dtypes.common import is_list_like
-        from pandas.io.excel._util import (
+        from my_happy_pandas.core.dtypes.common import is_list_like
+        from my_happy_pandas.io.excel._util import (
             _fill_mi_header,
             _maybe_convert_usecols,
         )
-        from pandas.io.parsers import TextParser
+        from my_happy_pandas.io.parsers import TextParser
         import re
 
         wb = load_workbook(filename=fname, read_only=True)
@@ -310,8 +310,8 @@ class PandasExcelParser(PandasParser):
         # Since we know the number of rows that occur before this partition, we can
         # correctly assign the index in cases of RangeIndex. If it is not a RangeIndex,
         # the index is already correct because it came from the data.
-        if isinstance(pandas_df.index, pandas.RangeIndex):
-            pandas_df.index = pandas.RangeIndex(
+        if isinstance(pandas_df.index, my_happy_pandas.RangeIndex):
+            pandas_df.index = my_happy_pandas.RangeIndex(
                 start=_skiprows, stop=len(pandas_df.index) + _skiprows
             )
         # We return the length if it is a RangeIndex (common case) to reduce
@@ -342,10 +342,10 @@ class PandasJSONParser(PandasParser):
             to_read = b"" + bio.read(end - start)
             bio.close()
             columns = kwargs.pop("columns")
-            pandas_df = pandas.read_json(BytesIO(to_read), **kwargs)
+            pandas_df = my_happy_pandas.read_json(BytesIO(to_read), **kwargs)
         else:
             # This only happens when we are reading with only one worker (Default)
-            return pandas.read_json(fname, **kwargs)
+            return my_happy_pandas.read_json(fname, **kwargs)
         if not pandas_df.columns.equals(columns):
             raise NotImplementedError("Columns must be the same across all rows.")
         partition_columns = pandas_df.columns
@@ -373,10 +373,10 @@ class PandasParquetParser(PandasParser):
                 fname = fs.open(fname)
 
         if num_splits is None:
-            return pandas.read_parquet(fname, **kwargs)
+            return my_happy_pandas.read_parquet(fname, **kwargs)
         kwargs["use_pandas_metadata"] = True
-        df = pandas.read_parquet(fname, **kwargs)
-        if isinstance(df.index, pandas.RangeIndex):
+        df = my_happy_pandas.read_parquet(fname, **kwargs)
+        if isinstance(df.index, my_happy_pandas.RangeIndex):
             idx = len(df.index)
         else:
             idx = df.index
@@ -393,8 +393,8 @@ class PandasHDFParser(PandasParser):  # pragma: no cover
         kwargs["key"] = kwargs.pop("_key", None)
         num_splits = kwargs.pop("num_splits", None)
         if num_splits is None:
-            return pandas.read_hdf(fname, **kwargs)
-        df = pandas.read_hdf(fname, **kwargs)
+            return my_happy_pandas.read_hdf(fname, **kwargs)
+        df = my_happy_pandas.read_hdf(fname, **kwargs)
         # Append the length of the index here to build it externally
         return _split_result_for_readers(0, num_splits, df) + [len(df.index), df.dtypes]
 
@@ -406,7 +406,7 @@ class PandasFeatherParser(PandasParser):
 
         num_splits = kwargs.pop("num_splits", None)
         if num_splits is None:
-            return pandas.read_feather(fname, **kwargs)
+            return my_happy_pandas.read_feather(fname, **kwargs)
         df = feather.read_feather(fname, **kwargs)
         # Append the length of the index here to build it externally
         return _split_result_for_readers(0, num_splits, df) + [len(df.index), df.dtypes]
@@ -417,8 +417,8 @@ class PandasSQLParser(PandasParser):
     def parse(sql, con, index_col, **kwargs):
         num_splits = kwargs.pop("num_splits", None)
         if num_splits is None:
-            return pandas.read_sql(sql, con, index_col=index_col, **kwargs)
-        df = pandas.read_sql(sql, con, index_col=index_col, **kwargs)
+            return my_happy_pandas.read_sql(sql, con, index_col=index_col, **kwargs)
+        df = my_happy_pandas.read_sql(sql, con, index_col=index_col, **kwargs)
         if index_col is None:
             index = len(df)
         else:

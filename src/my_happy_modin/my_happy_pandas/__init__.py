@@ -10,22 +10,10 @@
 # the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
 # ANY KIND, either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
+import my_happy_pandas
 
-import pandas
 
-__pandas_version__ = "1.1.5"
-
-if pandas.__version__ != __pandas_version__:
-    import warnings
-
-    warnings.warn(
-        "The pandas version installed {} does not match the supported pandas version in"
-        " my_happy_modin {}. This may cause undesired side effects!".format(
-            pandas.__version__, __pandas_version__
-        )
-    )
-
-from pandas import (
+from my_happy_pandas import (
     eval,
     cut,
     factorize,
@@ -284,4 +272,4 @@ __all__ = [
     "DEFAULT_NPARTITIONS",
 ]
 
-del pandas, Engine, Parameter
+del my_happy_pandas, Engine, Parameter

@@ -11,7 +11,7 @@
 # ANY KIND, either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-import pandas
+import my_happy_pandas
 
 from my_happy_modin.engines.base.frame.axis_partition import PandasFrameAxisPartition
 from .partition import PandasOnPythonFramePartition
@@ -25,7 +25,7 @@ class PandasOnPythonFrameAxisPartition(PandasFrameAxisPartition):
         self.list_of_blocks = [obj.data for obj in list_of_blocks]
 
     partition_type = PandasOnPythonFramePartition
-    instance_type = pandas.DataFrame
+    instance_type = my_happy_pandas.DataFrame
 
 
 class PandasOnPythonFrameColumnPartition(PandasOnPythonFrameAxisPartition):

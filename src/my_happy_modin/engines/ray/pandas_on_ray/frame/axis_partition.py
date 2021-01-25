@@ -11,7 +11,7 @@
 # ANY KIND, either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-import pandas
+import my_happy_pandas
 
 from my_happy_modin.engines.base.frame.axis_partition import PandasFrameAxisPartition
 from .partition import PandasOnRayFramePartition
@@ -103,9 +103,9 @@ def deploy_ray_func(func, *args):  # pragma: no cover
         The result of the function `func`.
     """
     result = func(*args)
-    if isinstance(result, pandas.DataFrame):
+    if isinstance(result, my_happy_pandas.DataFrame):
         return result, len(result), len(result.columns)
-    elif all(isinstance(r, pandas.DataFrame) for r in result):
+    elif all(isinstance(r, my_happy_pandas.DataFrame) for r in result):
         return [i for r in result for i in [r, len(r), len(r.columns)]]
     else:
         return [i for r in result for i in [r, None, None]]

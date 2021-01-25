@@ -11,7 +11,7 @@
 # ANY KIND, either express or implied. See the License for the specific language
 # governing permissions and limitations under the License.
 
-import pandas
+import my_happy_pandas
 
 from my_happy_modin.data_management.utils import length_fn_pandas, width_fn_pandas
 from my_happy_modin.engines.base.frame.partition import BaseFramePartition
@@ -89,7 +89,7 @@ class PandasOnPythonFramePartition(BaseFramePartition):
 
     def mask(self, row_indices=None, col_indices=None):
         new_obj = self.add_to_apply_calls(
-            lambda df: pandas.DataFrame(df.iloc[row_indices, col_indices])
+            lambda df: my_happy_pandas.DataFrame(df.iloc[row_indices, col_indices])
         )
         if not isinstance(row_indices, slice):
             new_obj._length_cache = len(row_indices)
@@ -107,7 +107,7 @@ class PandasOnPythonFramePartition(BaseFramePartition):
             A Pandas DataFrame.
         """
         dataframe = self.get()
-        assert type(dataframe) is pandas.DataFrame or type(dataframe) is pandas.Series
+        assert type(dataframe) is my_happy_pandas.DataFrame or type(dataframe) is my_happy_pandas.Series
 
         return dataframe
 
@@ -183,4 +183,4 @@ class PandasOnPythonFramePartition(BaseFramePartition):
 
     @classmethod
     def empty(cls):
-        return cls(pandas.DataFrame())
+        return cls(my_happy_pandas.DataFrame())

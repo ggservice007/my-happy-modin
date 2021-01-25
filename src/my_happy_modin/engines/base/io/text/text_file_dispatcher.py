@@ -119,7 +119,7 @@ class TextFileDispatcher(FileDispatcher):
         f: file to be partitioned
         num_partitions: int, optional
             For what number of partitions split a file.
-            If not specified grabs the value from `my_happy_modin.pandas.DEFAULT_NPARTITIONS`
+            If not specified grabs the value from `my_happy_modin.my_happy_pandas.DEFAULT_NPARTITIONS`
         nrows: int, optional
             Number of rows of file to read.
         skiprows: array or callable, optional
@@ -135,7 +135,7 @@ class TextFileDispatcher(FileDispatcher):
         beginning and the end offsets of the current chunk.
         """
         if num_partitions is None:
-            from my_happy_modin.pandas import DEFAULT_NPARTITIONS
+            from my_happy_modin.my_happy_pandas import DEFAULT_NPARTITIONS
 
             num_partitions = DEFAULT_NPARTITIONS
 

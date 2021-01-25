@@ -12,7 +12,7 @@
 # governing permissions and limitations under the License.
 
 import numpy as np
-import pandas
+import my_happy_pandas
 
 from .function import Function
 
@@ -53,7 +53,7 @@ class BinaryFunction(Function):
                         )
                     )
             else:
-                if isinstance(other, (list, np.ndarray, pandas.Series)):
+                if isinstance(other, (list, np.ndarray, my_happy_pandas.Series)):
                     new_columns = query_compiler.columns
                     new_modin_frame = query_compiler._modin_frame._apply_full_axis(
                         axis,
