@@ -101,7 +101,10 @@ def _update_engine(publisher: Parameter):
         # With OmniSci backend there is only a single worker per node
         # and we allow it to work on all cores.
         if _is_first_update.get("Ray", True):
-            initialize_ray()
+            # initialize_ray()
+            if ray.is_initialized() == False:
+                ray.init(address='auto')
+
         num_cpus = ray.cluster_resources()["CPU"]
 
 

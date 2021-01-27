@@ -31,4 +31,10 @@ python3.7 -m pip uninstall my-happy-modin
 ```
 
 
-## dependency
+
+
+## Notice
+Before use, make sure you have started the ray cluster.
+```
+ray start --head --port 8266 --dashboard-host 0.0.0.0 --metrics-export-port=8380
+```
