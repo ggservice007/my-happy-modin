@@ -24,9 +24,7 @@ class ErrorMessage(object):
         if message == "":
             message = "This functionality is not yet available in my_happy_modin."
         raise NotImplementedError(
-            "{}\n"
-            "To request implementation, send an email to "
-            "feature_requests@my_happy_modin.org".format(message)
+            "{}\n".format(message)
         )
 
     @classmethod
@@ -48,8 +46,6 @@ class ErrorMessage(object):
         if not cls.printed_request_implementation:
             message = (
                 "{}\n".format(message)
-                + "To request implementation, send an email to "
-                + "feature_requests@my_happy_modin.org."
             )
             cls.printed_request_implementation = True
         warnings.warn(message)
