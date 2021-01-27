@@ -1,6 +1,6 @@
 def get_versions():
     return {
-        'version': "0.8.16"
+        'version': "0.8.19"
     }
 
 def get_version():

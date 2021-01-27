@@ -16,12 +16,13 @@ OS: centos7
 
 python:  3.7.7
 
-
 ## install
 ```shell
-python3.7 -m pip install -i https://pypi.org/simple/ -U my-happy-modin
-
 python3.7 -m pip install -U my-happy-modin
+
+or
+
+python3.7 -m pip install -i https://pypi.org/simple/ -U my-happy-modin
 ```
 
 ## uninstall

@@ -7,7 +7,8 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
 
 install_requires = [
-            'my_happy_pandas>=1.1.6',
+            'ray>=1.1.0',
+            'my_happy_pandas>=1.1.10',
         ]
 
 from happy_python_utils import version
